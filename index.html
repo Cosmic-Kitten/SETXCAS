@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sean Martin Therapy | Nature-Inspired Mental Wellness</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sage: {
+                            50: '#f4f7f4',
+                            100: '#e3eae3',
+                            200: '#c6d6c6',
+                            300: '#a3baa3',
+                            400: '#7c9a7d',
+                            500: '#5c7c5d',
+                            600: '#476348',
+                            700: '#384f39',
+                            800: '#2f4130',
+                            900: '#212d22',
+                        },
+                        earth: {
+                            50: '#fbf9f5',
+                            100: '#f5eee3',
+                            200: '#e7d8c5',
+                            300: '#d5bca1',
+                            400: '#bf9c7a',
+                            500: '#a57d59',
+                            600: '#8a6242',
+                            700: '#6f4b32',
+                            800: '#5a3d2b',
+                        },
+                        sand: '#FDFBF7',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            background-color: #FDFBF7;
+            color: #2f4130;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+        .serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f4f7f4;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a3baa3;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7c9a7d;
+        }
+        /* Glassmorphism */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(198, 214, 198, 0.5);
+        }
+        /* Background Nature Canvas */
+        #natureCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-sage-200 selection:text-sage-900">
+
+    <!-- HEADER / NAVIGATION -->
+    <header class="sticky top-0 z-40 bg-sand/90 backdrop-blur-md border-b border-sage-100/80 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-full bg-sage-100 text-sage-600 flex items-center justify-center group-hover:bg-sage-600 group-hover:text-white transition-all duration-300 shadow-sm">
+                    <i data-lucide="leaf" class="w-5 h-5"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="serif-title font-bold text-xl text-sage-900 tracking-tight leading-none">Sean Martin</span>
+                    <span class="text-xs text-earth-600 tracking-wider font-medium uppercase mt-0.5">Therapy & Counseling</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-sage-800">
+                <a href="#about" class="hover:text-sage-500 transition-colors">About Sean</a>
+                <a href="#process" class="hover:text-sage-500 transition-colors">15-Min Process</a>
+                <a href="#booking" class="hover:text-sage-500 transition-colors">Book Consultation</a>
+                <a href="#faqs" class="hover:text-sage-500 transition-colors">FAQs</a>
+                <a href="#contact" class="hover:text-sage-500 transition-colors">Contact</a>
+            </nav>
+
+            <!-- Header Controls & CTA -->
+            <div class="hidden sm:flex items-center gap-4">
+                <!-- Audio Ambient Generator Toggle -->
+                <button id="audioToggleBtn" onclick="toggleNatureAudio()" title="Toggle Calming Nature Sounds" class="p-2.5 rounded-full bg-sage-100 text-sage-700 hover:bg-sage-200 transition-colors flex items-center gap-2 text-xs font-medium border border-sage-200">
+                    <i data-lucide="volume-x" id="audioIcon" class="w-4 h-4"></i>
+                    <span id="audioLabel" class="hidden lg:inline">Nature Sounds</span>
+                </button>
+
+                <a href="#booking" class="px-5 py-2.5 bg-sage-600 hover:bg-sage-700 text-white text-sm font-semibold rounded-full transition-all shadow-sm hover:shadow flex items-center gap-2">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    <span>Book 15-Min Consult</span>
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <div class="flex items-center gap-2 md:hidden">
+                <button onclick="toggleNatureAudio()" class="p-2 rounded-lg text-sage-800 hover:bg-sage-100">
+                    <i data-lucide="volume-x" id="audioIconMobile" class="w-5 h-5"></i>
+                </button>
+                <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="p-2 rounded-lg text-sage-800 hover:bg-sage-100 focus:outline-none">
+                    <i data-lucide="menu" id="menuIcon" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobileMenu" class="hidden md:hidden bg-sand border-b border-sage-100 px-4 pt-2 pb-6 space-y-3">
+            <a href="#about" onclick="toggleMobileMenu()" class="block py-2 text-sage-800 hover:text-sage-500 font-medium">About Sean</a>
+            <a href="#process" onclick="toggleMobileMenu()" class="block py-2 text-sage-800 hover:text-sage-500 font-medium">15-Min Process</a>
+            <a href="#booking" onclick="toggleMobileMenu()" class="block py-2 text-sage-800 hover:text-sage-500 font-medium">Book Consultation</a>
+            <a href="#faqs" onclick="toggleMobileMenu()" class="block py-2 text-sage-800 hover:text-sage-500 font-medium">FAQs</a>
+            <a href="#contact" onclick="toggleMobileMenu()" class="block py-2 text-sage-800 hover:text-sage-500 font-medium">Contact</a>
+            <a href="#booking" onclick="toggleMobileMenu()" class="w-full mt-2 px-5 py-3 bg-sage-600 text-white font-semibold rounded-full flex items-center justify-center gap-2 text-center">
+                <i data-lucide="calendar" class="w-4 h-4"></i>
+                <span>Book 15-Min Consultation</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        <!-- HERO SECTION -->
+        <section class="relative py-16 md:py-28 overflow-hidden bg-gradient-to-b from-sage-50/80 via-earth-50/50 to-sand">
+            <!-- Animated Nature Leaf Canvas -->
+            <canvas id="natureCanvas"></canvas>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
+                    
+                    <!-- Hero Text Content -->
+                    <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sage-100/80 text-sage-800 text-xs sm:text-sm font-medium border border-sage-200 shadow-sm">
+                            <i data-lucide="sparkles" class="w-4 h-4 text-sage-600"></i>
+                            <span>Calm, Inviting & Personal Therapy</span>
+                        </div>
+
+                        <h1 class="serif-title text-4xl sm:text-5xl lg:text-6xl font-bold text-sage-900 leading-tight">
+                            A Gentle Space to Begin Your Healing Journey
+                        </h1>
+
+                        <p class="text-base sm:text-lg text-sage-700 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light">
+                            Welcome. I’m <strong>Sean Martin</strong>. Taking the first step in therapy should be encouraging, not overwhelming. Explore how we can work together with a relaxed, 15-minute consultation call.
+                        </p>
+
+                        <!-- Key Highlights Badges -->
+                        <div class="pt-1 flex flex-wrap justify-center lg:justify-start gap-3 text-xs sm:text-sm text-sage-800">
+                            <span class="flex items-center gap-2 bg-white/90 px-3.5 py-2 rounded-xl border border-sage-100 shadow-sm font-medium">
+                                <i data-lucide="shield-check" class="w-4 h-4 text-sage-600"></i>
+                                Zero Forms Required to Book
+                            </span>
+                            <span class="flex items-center gap-2 bg-white/90 px-3.5 py-2 rounded-xl border border-sage-100 shadow-sm font-medium">
+                                <i data-lucide="clock" class="w-4 h-4 text-sage-600"></i>
+                                Free 15-Minute First Meeting
+                            </span>
+                            <span class="flex items-center gap-2 bg-white/90 px-3.5 py-2 rounded-xl border border-sage-100 shadow-sm font-medium">
+                                <i data-lucide="calendar" class="w-4 h-4 text-sage-600"></i>
+                                Google Calendar Sync
+                            </span>
+                        </div>
+
+                        <!-- CTA Actions -->
+                        <div class="pt-4 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                            <a href="#booking" class="w-full sm:w-auto px-8 py-4 bg-sage-600 hover:bg-sage-700 text-white font-semibold rounded-full shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3 text-center">
+                                <span>Schedule 15-Min Free Call</span>
+                                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </a>
+                            <a href="#process" class="w-full sm:w-auto px-7 py-4 bg-white hover:bg-sage-50 text-sage-800 border border-sage-200 font-semibold rounded-full transition-all text-center">
+                                How It Works
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Hero Visual / Image Feature -->
+                    <div class="lg:col-span-5 relative">
+                        <div class="relative mx-auto max-w-md lg:max-w-none">
+                            <div class="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border-4 border-white relative bg-sage-200">
+                                <img src="https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=900&q=80" 
+                                     alt="Calm nature sunbeams in forest" 
+                                     class="w-full h-full object-cover object-center transform hover:scale-105 transition-transform duration-700"
+                                     onerror="this.src='https://placehold.co/800x1000/a3baa3/2f4130?text=Calm+Nature+Setting'" />
+                                <div class="absolute inset-0 bg-gradient-to-t from-sage-900/60 via-transparent to-transparent"></div>
+                                
+                                <div class="absolute bottom-6 left-6 right-6 p-5 glass-card rounded-2xl text-sage-900">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="w-9 h-9 rounded-full bg-sage-600 text-white flex items-center justify-center flex-shrink-0">
+                                            <i data-lucide="heart-handshake" class="w-5 h-5"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-sm">No Pressure Approach</p>
+                                            <p class="text-xs text-sage-700">Find if we are a good fit first</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-sage-800 leading-relaxed italic">
+                                        "Therapy should feel grounded and approachable from day one."
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT SEAN MARTIN SECTION -->
+        <section id="about" class="py-20 bg-white relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
+                    
+                    <!-- Portrait Visual -->
+                    <div class="lg:col-span-5 order-2 lg:order-1">
+                        <div class="relative">
+                            <div class="aspect-[3/4] rounded-3xl overflow-hidden shadow-lg border-8 border-sand bg-sage-100">
+                                <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80" 
+                                     alt="Sean Martin - Therapist" 
+                                     class="w-full h-full object-cover"
+                                     onerror="this.src='https://placehold.co/600x800/a3baa3/2f4130?text=Sean+Martin'" />
+                            </div>
+                            <!-- Floating Tag -->
+                            <div class="absolute -bottom-5 -right-5 p-5 glass-card rounded-2xl hidden sm:block max-w-xs shadow-md">
+                                <div class="flex items-center gap-2 text-earth-700 font-semibold text-sm mb-1">
+                                    <i data-lucide="compass" class="w-4 h-4"></i>
+                                    <span>Grounded & Empathetic</span>
+                                </div>
+                                <p class="text-xs text-sage-800">
+                                    Creating a relaxed environment tailored to your unique pace and life journey.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Narrative Content -->
+                    <div class="lg:col-span-7 order-1 lg:order-2 space-y-6">
+                        <div class="inline-flex items-center gap-2 text-earth-600 font-bold text-xs uppercase tracking-widest">
+                            <i data-lucide="user" class="w-4 h-4"></i>
+                            <span>Meet Your Therapist</span>
+                        </div>
+
+                        <h2 class="serif-title text-3xl sm:text-4xl font-bold text-sage-900">
+                            Hi, I’m Sean Martin
+                        </h2>
+
+                        <div class="space-y-4 text-sage-800 text-base leading-relaxed font-light">
+                            <p>
+                                I believe that finding the right therapist is one of the most important decisions you can make for your mental well-being. Too often, the process is weighed down by lengthy forms, rigid assessments, and clinical barriers before you even speak to a human being.
+                            </p>
+                            <p>
+                                My approach is different. Inspired by the calm and clarity of nature, I offer a serene, compassionate space where you can feel heard and supported without judgment. 
+                            </p>
+                            <p>
+                                Before committing to ongoing sessions, we start with a simple 15-minute conversation. It’s an opportunity for me to explain my therapy process, hear about what you're experiencing, and together determine if my practice is the right fit for your needs.
+                            </p>
+                        </div>
+
+                        <!-- Core Principles Grid -->
+                        <div class="grid sm:grid-cols-2 gap-4 pt-2">
+                            <div class="p-4 rounded-2xl bg-earth-50 border border-earth-200/60 flex items-start gap-3">
+                                <div class="p-2 rounded-xl bg-earth-100 text-earth-700 flex-shrink-0">
+                                    <i data-lucide="sun" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-sage-900 text-sm">Calm & Inviting Environment</h4>
+                                    <p class="text-xs text-sage-700 mt-1">A safe space designed to reduce anxiety and encourage openness.</p>
+                                </div>
+                            </div>
+
+                            <div class="p-4 rounded-2xl bg-sage-50 border border-sage-200/60 flex items-start gap-3">
+                                <div class="p-2 rounded-xl bg-sage-100 text-sage-700 flex-shrink-0">
+                                    <i data-lucide="messages-square" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-sage-900 text-sm">Open Dialogue</h4>
+                                    <p class="text-xs text-sage-700 mt-1">No upfront paperwork—just an honest, warm conversation.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <a href="#booking" class="inline-flex items-center gap-2 px-6 py-3 bg-sage-600 hover:bg-sage-700 text-white font-semibold text-sm rounded-full transition-all">
+                                <i data-lucide="calendar" class="w-4 h-4"></i>
+                                <span>Schedule Free 15-Min Discovery Call</span>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- THE 15-MINUTE PROCESS / HOW IT WORKS SECTION -->
+        <section id="process" class="py-20 bg-earth-50/40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
+                    <span class="text-xs font-bold tracking-widest text-earth-600 uppercase">Effortless & Simple</span>
+                    <h2 class="serif-title text-3xl sm:text-4xl font-bold text-sage-900">
+                        The 15-Minute Discovery Process
+                    </h2>
+                    <p class="text-sage-700 text-base sm:text-lg">
+                        Designed to be completely stress-free. No clinical intake forms or upfront commitments required.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Step 1 -->
+                    <div class="p-8 rounded-3xl bg-white border border-sage-100 hover:border-sage-300 transition-all shadow-sm hover:shadow-md relative group">
+                        <div class="w-12 h-12 rounded-2xl bg-sage-100 text-sage-700 flex items-center justify-center font-bold text-lg mb-6 group-hover:bg-sage-600 group-hover:text-white transition-colors">
+                            01
+                        </div>
+                        <h3 class="serif-title text-xl font-bold text-sage-900 mb-3">Pick a Time Slot</h3>
+                        <p class="text-sage-700 text-sm leading-relaxed mb-4">
+                            Choose a 15-minute slot from the Google Calendar scheduler below that seamlessly fits your schedule.
+                        </p>
+                        <div class="text-xs font-semibold text-sage-600 flex items-center gap-1.5 pt-2 border-t border-sage-100">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>Zero preliminary paperwork</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="p-8 rounded-3xl bg-white border border-sage-100 hover:border-sage-300 transition-all shadow-sm hover:shadow-md relative group">
+                        <div class="w-12 h-12 rounded-2xl bg-sage-100 text-sage-700 flex items-center justify-center font-bold text-lg mb-6 group-hover:bg-sage-600 group-hover:text-white transition-colors">
+                            02
+                        </div>
+                        <h3 class="serif-title text-xl font-bold text-sage-900 mb-3">15-Minute Intro Call</h3>
+                        <p class="text-sage-700 text-sm leading-relaxed mb-4">
+                            We’ll meet online via Google Meet or phone. I'll explain my therapy approach and listen to what you'd like to work on.
+                        </p>
+                        <div class="text-xs font-semibold text-sage-600 flex items-center gap-1.5 pt-2 border-t border-sage-100">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>Relaxed & informative conversation</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="p-8 rounded-3xl bg-white border border-sage-100 hover:border-sage-300 transition-all shadow-sm hover:shadow-md relative group">
+                        <div class="w-12 h-12 rounded-2xl bg-sage-100 text-sage-700 flex items-center justify-center font-bold text-lg mb-6 group-hover:bg-sage-600 group-hover:text-white transition-colors">
+                            03
+                        </div>
+                        <h3 class="serif-title text-xl font-bold text-sage-900 mb-3">Decide Next Steps</h3>
+                        <p class="text-sage-700 text-sm leading-relaxed mb-4">
+                            Therapy works best with mutual trust. After our quick call, you decide if you'd like to move forward with full sessions.
+                        </p>
+                        <div class="text-xs font-semibold text-sage-600 flex items-center gap-1.5 pt-2 border-t border-sage-100">
+                            <i data-lucide="check" class="w-4 h-4"></i>
+                            <span>No pressure or obligation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No Forms Callout Box -->
+                <div class="mt-12 bg-white border border-sage-200 rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-sage-100 text-sage-700 flex-shrink-0 flex items-center justify-center">
+                            <i data-lucide="file-x-2" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sage-900 text-base sm:text-lg">No Intake Forms Required At Booking</h4>
+                            <p class="text-sage-700 text-xs sm:text-sm mt-0.5">We save the formal paperwork for after we've met and both feel confident in moving forward together.</p>
+                        </div>
+                    </div>
+                    <a href="#booking" class="flex-shrink-0 px-6 py-3 bg-sage-600 hover:bg-sage-700 text-white text-sm font-semibold rounded-full transition-all">
+                        Select Your Time
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- INTERACTIVE BOOKING SECTION (SIMULATED GOOGLE CALENDAR SCHEDULER) -->
+        <section id="booking" class="py-20 bg-white">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-12 space-y-3">
+                    <span class="text-xs font-bold tracking-widest text-earth-600 uppercase">Google Calendar Integration</span>
+                    <h2 class="serif-title text-3xl sm:text-4xl font-bold text-sage-900">
+                        Book Your Free 15-Minute Consultation
+                    </h2>
+                    <p class="text-sage-700 text-base">
+                        Select an available 15-minute slot below. You will automatically receive a Google Calendar invite with a video call link.
+                    </p>
+                </div>
+
+                <!-- Calendar Scheduling Container -->
+                <div class="bg-sand border border-sage-200 rounded-3xl shadow-xl overflow-hidden">
+                    <!-- Calendar Header Bar -->
+                    <div class="bg-sage-800 text-white p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-sage-700 flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="calendar-days" class="w-5 h-5 text-sage-200"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg leading-tight">15-Minute Initial Consultation</h3>
+                                <p class="text-xs text-sage-300">With Sean Martin (sean.martin@setxcas.com)</p>
+                            </div>
+                        </div>
+                        <div class="text-xs bg-sage-700 px-3 py-1.5 rounded-full border border-sage-600 text-sage-200 flex items-center gap-1.5">
+                            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                            <span>15 Minutes • Free</span>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Scheduler Body -->
+                    <div class="p-6 sm:p-10">
+                        <div id="bookingWidgetContent">
+                            <div class="grid lg:grid-cols-12 gap-8">
+                                
+                                <!-- Column 1: Date Selector -->
+                                <div class="lg:col-span-7 space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="font-semibold text-sage-900 text-sm flex items-center gap-2">
+                                            <span class="w-6 h-6 rounded-full bg-sage-200 text-sage-800 text-xs flex items-center justify-center font-bold">1</span>
+                                            Select Date
+                                        </h4>
+                                        <span id="calendarTzLabel" class="text-xs text-sage-500">Timezone: Central (CT)</span>
+                                    </div>
+                                    
+                                    <!-- Month Header Nav -->
+                                    <div class="flex items-center justify-between bg-white p-3 rounded-2xl border border-sage-200 text-sm font-semibold text-sage-800">
+                                        <button type="button" onclick="changeMonth(-1)" class="p-1 hover:bg-sage-100 rounded-lg text-sage-600 transition-colors">
+                                            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                                        </button>
+                                        <span id="currentMonthYear">October 2026</span>
+                                        <button type="button" onclick="changeMonth(1)" class="p-1 hover:bg-sage-100 rounded-lg text-sage-600 transition-colors">
+                                            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Grid of Days -->
+                                    <div class="bg-white p-4 rounded-2xl border border-sage-200 shadow-sm">
+                                        <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-sage-500 mb-2">
+                                            <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                                        </div>
+                                        <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1">
+                                            <!-- Dynamically populated days -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Column 2: Available 15-Minute Slots -->
+                                <div class="lg:col-span-5 space-y-4">
+                                    <h4 class="font-semibold text-sage-900 text-sm flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-sage-200 text-sage-800 text-xs flex items-center justify-center font-bold">2</span>
+                                        Select 15-Min Time
+                                    </h4>
+                                    
+                                    <div id="selectedDateLabel" class="text-xs font-medium text-sage-700 bg-sage-100/80 p-3 rounded-xl border border-sage-200">
+                                        Please pick a date on the calendar
+                                    </div>
+
+                                    <div id="timeSlotsContainer" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+                                        <p class="text-xs text-sage-500 italic p-2">Select a highlighted date to see available 15-minute consultation slots.</p>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Minimal Confirmation Details (Form) -->
+                        <div id="bookingDetailsForm" class="hidden pt-6 border-t border-sage-200 mt-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="font-semibold text-sage-900 text-sm flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-full bg-sage-200 text-sage-800 text-xs flex items-center justify-center font-bold">3</span>
+                                    Your Information
+                                </h4>
+                                <span class="text-xs bg-sage-100 text-sage-800 px-2.5 py-1 rounded-md font-medium">No Preliminary Forms Required</span>
+                            </div>
+
+                            <form id="scheduleForm" onsubmit="handleBookingSubmit(event)" class="space-y-4 max-w-xl">
+                                <div class="grid sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="clientName" class="block text-xs font-semibold text-sage-800 mb-1">Full Name *</label>
+                                        <input type="text" id="clientName" required placeholder="Jane Doe" class="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:ring-2 focus:ring-sage-500 text-sm bg-white">
+                                    </div>
+                                    <div>
+                                        <label for="clientEmail" class="block text-xs font-semibold text-sage-800 mb-1">Email Address *</label>
+                                        <input type="email" id="clientEmail" required placeholder="jane@example.com" class="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:ring-2 focus:ring-sage-500 text-sm bg-white">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="clientNotes" class="block text-xs font-semibold text-sage-800 mb-1">Optional Note (What brings you to therapy?)</label>
+                                    <textarea id="clientNotes" rows="2" placeholder="Feel free to leave a short note, or leave blank..." class="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:ring-2 focus:ring-sage-500 text-sm bg-white"></textarea>
+                                </div>
+                                <div class="flex items-center justify-between pt-2">
+                                    <button type="button" onclick="cancelSlotSelection()" class="text-xs text-sage-600 hover:text-sage-800 font-medium flex items-center gap-1">
+                                        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                                        <span>Change Date or Time</span>
+                                    </button>
+                                    <button type="submit" class="px-7 py-3 bg-sage-600 hover:bg-sage-700 text-white font-semibold text-sm rounded-full shadow transition-all flex items-center gap-2">
+                                        <i data-lucide="check" class="w-4 h-4"></i>
+                                        <span>Confirm 15-Min Call</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Confirmation Success Banner -->
+                        <div id="bookingConfirmation" class="hidden text-center py-10 space-y-4">
+                            <div class="w-16 h-16 rounded-full bg-sage-100 text-sage-600 mx-auto flex items-center justify-center">
+                                <i data-lucide="check-circle-2" class="w-10 h-10"></i>
+                            </div>
+                            <h3 class="serif-title text-2xl font-bold text-sage-900">Your Consultation is Confirmed!</h3>
+                            <p class="text-sm text-sage-700 max-w-md mx-auto">
+                                A Google Calendar invitation has been created and sent to <span id="confirmedEmail" class="font-semibold text-sage-900"></span>.
+                            </p>
+                            <div class="p-5 bg-white rounded-2xl border border-sage-200 max-w-md mx-auto text-xs text-sage-800 space-y-2 text-left shadow-sm">
+                                <div class="flex items-center gap-2 text-sage-700 font-medium">
+                                    <i data-lucide="video" class="w-4 h-4 text-sage-600"></i>
+                                    <span>Google Meet link included in calendar event</span>
+                                </div>
+                                <div class="pt-2 border-t border-sage-100">
+                                    <p><strong>Appointment:</strong> 15-Minute Introductory Call</p>
+                                    <p><strong>Scheduled Time:</strong> <span id="confirmedDateTime" class="font-semibold text-sage-900"></span></p>
+                                    <p><strong>Host:</strong> Sean Martin (sean.martin@setxcas.com)</p>
+                                </div>
+                            </div>
+                            <div class="pt-2">
+                                <button onclick="resetBookingWidget()" class="px-6 py-2.5 border border-sage-300 text-sage-800 text-xs font-semibold rounded-full hover:bg-sage-100 transition-colors">
+                                    Book Another Time
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQS SECTION -->
+        <section id="faqs" class="py-20 bg-sage-50/50">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12 space-y-3">
+                    <span class="text-xs font-bold tracking-widest text-earth-600 uppercase">Got Questions?</span>
+                    <h2 class="serif-title text-3xl sm:text-4xl font-bold text-sage-900">
+                        Frequently Asked Questions
+                    </h2>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- FAQ 1 -->
+                    <div class="bg-white rounded-2xl border border-sage-200 overflow-hidden shadow-sm">
+                        <button onclick="toggleFaq(1)" class="w-full p-6 text-left font-semibold text-sage-900 flex justify-between items-center gap-4 hover:bg-sand transition-colors">
+                            <span>Do I need to fill out medical paperwork or forms before booking?</span>
+                            <i data-lucide="chevron-down" id="faqIcon-1" class="w-5 h-5 text-sage-500 transition-transform"></i>
+                        </button>
+                        <div id="faqAnswer-1" class="hidden px-6 pb-6 text-sm text-sage-700 leading-relaxed border-t border-sage-100 pt-4">
+                            No! Our initial 15-minute consultation call requires zero upfront paperwork or clinical intake forms. It is simply a relaxed, short conversation to introduce my practice, explain the therapy process, and see if we feel like a good mutual fit.
+                        </div>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="bg-white rounded-2xl border border-sage-200 overflow-hidden shadow-sm">
+                        <button onclick="toggleFaq(2)" class="w-full p-6 text-left font-semibold text-sage-900 flex justify-between items-center gap-4 hover:bg-sand transition-colors">
+                            <span>How do the 15-minute consultation calls work?</span>
+                            <i data-lucide="chevron-down" id="faqIcon-2" class="w-5 h-5 text-sage-500 transition-transform"></i>
+                        </button>
+                        <div id="faqAnswer-2" class="hidden px-6 pb-6 text-sm text-sage-700 leading-relaxed border-t border-sage-100 pt-4">
+                            Once you pick a slot on the calendar, a Google Calendar invitation with a video call link will be sent to your email. During the call, I’ll share a quick overview of how I conduct therapy, listen to what you're hoping to achieve, and answer any questions you have.
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="bg-white rounded-2xl border border-sage-200 overflow-hidden shadow-sm">
+                        <button onclick="toggleFaq(3)" class="w-full p-6 text-left font-semibold text-sage-900 flex justify-between items-center gap-4 hover:bg-sand transition-colors">
+                            <span>What happens after our 15-minute call?</span>
+                            <i data-lucide="chevron-down" id="faqIcon-3" class="w-5 h-5 text-sage-500 transition-transform"></i>
+                        </button>
+                        <div id="faqAnswer-3" class="hidden px-6 pb-6 text-sm text-sage-700 leading-relaxed border-t border-sage-100 pt-4">
+                            If you feel comfortable and would like to proceed with therapy sessions, we will set up your first full appointment and handle any necessary paperwork at that time. If it doesn't feel like the right match, there is no obligation whatsoever.
+                        </div>
+                    </div>
+
+                    <!-- FAQ 4 -->
+                    <div class="bg-white rounded-2xl border border-sage-200 overflow-hidden shadow-sm">
+                        <button onclick="toggleFaq(4)" class="w-full p-6 text-left font-semibold text-sage-900 flex justify-between items-center gap-4 hover:bg-sand transition-colors">
+                            <span>Are sessions online or in-person?</span>
+                            <i data-lucide="chevron-down" id="faqIcon-4" class="w-5 h-5 text-sage-500 transition-transform"></i>
+                        </button>
+                        <div id="faqAnswer-4" class="hidden px-6 pb-6 text-sm text-sage-700 leading-relaxed border-t border-sage-100 pt-4">
+                            I offer convenient online video therapy sessions integrated via Google Meet, allowing you to participate comfortably from your home or personal space.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT & FOOTER SECTION -->
+        <section id="contact" class="py-16 bg-sage-900 text-white relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid md:grid-cols-12 gap-12 pb-12 border-b border-sage-800">
+                    
+                    <!-- Left: Brand Info -->
+                    <div class="md:col-span-6 space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-sage-700 text-sage-200 flex items-center justify-center">
+                                <i data-lucide="leaf" class="w-5 h-5"></i>
+                            </div>
+                            <span class="serif-title font-bold text-2xl text-white">Sean Martin Therapy</span>
+                        </div>
+                        <p class="text-sage-300 text-sm max-w-md leading-relaxed">
+                            A calm, nature-grounded therapy practice dedicated to providing supportive, judgment-free mental healthcare.
+                        </p>
+                    </div>
+
+                    <!-- Right: Direct Contact -->
+                    <div class="md:col-span-6 space-y-4">
+                        <h4 class="font-bold text-sm text-sage-200 uppercase tracking-wider">Direct Contact</h4>
+                        <div class="space-y-2 text-sm text-sage-300">
+                            <a href="mailto:sean.martin@setxcas.com" class="flex items-center gap-3 hover:text-white transition-colors">
+                                <i data-lucide="mail" class="w-4 h-4 text-sage-400"></i>
+                                <span>sean.martin@setxcas.com</span>
+                            </a>
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="calendar" class="w-4 h-4 text-sage-400"></i>
+                                <span>Google Calendar Appointments</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-sage-400 gap-4">
+                    <p>© 2026 Sean Martin Therapy. All rights reserved.</p>
+                    <p>Designed for peaceful, stress-free care.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // -------------------------------------------------------------
+        // MOBILE MENU TOGGLE
+        // -------------------------------------------------------------
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // -------------------------------------------------------------
+        // FAQ TOGGLE LOGIC
+        // -------------------------------------------------------------
+        function toggleFaq(index) {
+            const answer = document.getElementById(`faqAnswer-${index}`);
+            const icon = document.getElementById(`faqIcon-${index}`);
+            
+            if (answer.classList.contains('hidden')) {
+                answer.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                answer.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // -------------------------------------------------------------
+        // NATURE AUDIO GENERATOR (Web Audio API - Soft Rain / Wind sound)
+        // -------------------------------------------------------------
+        let audioCtx = null;
+        let isAudioPlaying = false;
+        let noiseNode = null;
+
+        function toggleNatureAudio() {
+            if (!isAudioPlaying) {
+                startCalmAudio();
+            } else {
+                stopCalmAudio();
+            }
+        }
+
+        function startCalmAudio() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!audioCtx) audioCtx = new AudioContext();
+
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                // Buffer size & noise generation
+                const bufferSize = audioCtx.sampleRate * 2;
+                const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+
+                // Pink noise generation for soft ambient breeze sound
+                let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    let white = Math.random() * 2 - 1;
+                    b0 = 0.99886 * b0 + white * 0.0555179;
+                    b1 = 0.99332 * b1 + white * 0.0750759;
+                    b2 = 0.96900 * b2 + white * 0.1538520;
+                    b3 = 0.86650 * b3 + white * 0.3104856;
+                    b4 = 0.55000 * b4 + white * 0.5329522;
+                    b5 = -0.7616 * b5 - white * 0.0168980;
+                    output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+                    output[i] *= 0.03; // Low volume
+                    b6 = white * 0.115926;
+                }
+
+                noiseNode = audioCtx.createBufferSource();
+                noiseNode.buffer = noiseBuffer;
+                noiseNode.loop = true;
+
+                // Gentle Lowpass Filter
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+
+                noiseNode.connect(filter);
+                filter.connect(audioCtx.destination);
+                noiseNode.start();
+
+                isAudioPlaying = true;
+                updateAudioUI(true);
+            } catch (e) {
+                console.log("Audio API not supported or blocked");
+            }
+        }
+
+        function stopCalmAudio() {
+            if (noiseNode) {
+                noiseNode.stop();
+                noiseNode.disconnect();
+                noiseNode = null;
+            }
+            isAudioPlaying = false;
+            updateAudioUI(false);
+        }
+
+        function updateAudioUI(playing) {
+            const icon = document.getElementById('audioIcon');
+            const iconMobile = document.getElementById('audioIconMobile');
+            const label = document.getElementById('audioLabel');
+
+            if (playing) {
+                if (icon) icon.setAttribute('data-lucide', 'volume-2');
+                if (iconMobile) iconMobile.setAttribute('data-lucide', 'volume-2');
+                if (label) label.textContent = 'Mute Sounds';
+            } else {
+                if (icon) icon.setAttribute('data-lucide', 'volume-x');
+                if (iconMobile) iconMobile.setAttribute('data-lucide', 'volume-x');
+                if (label) label.textContent = 'Nature Sounds';
+            }
+            lucide.createIcons();
+        }
+
+        // -------------------------------------------------------------
+        // CANVAS ANIMATION (Floating Nature Leaves)
+        // -------------------------------------------------------------
+        const canvas = document.getElementById('natureCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const leaves = [];
+        const leafCount = 18;
+
+        for (let i = 0; i < leafCount; i++) {
+            leaves.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 12 + 8,
+                speedY: Math.random() * 0.6 + 0.2,
+                speedX: Math.sin(Math.random() * Math.PI) * 0.4,
+                rotation: Math.random() * 360,
+                rotSpeed: (Math.random() - 0.5) * 0.5,
+                opacity: Math.random() * 0.3 + 0.15
+            });
+        }
+
+        function animateLeaves() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            leaves.forEach(leaf => {
+                leaf.y += leaf.speedY;
+                leaf.x += Math.sin(leaf.y * 0.01) * 0.5;
+                leaf.rotation += leaf.rotSpeed;
+
+                if (leaf.y > canvas.height + 20) {
+                    leaf.y = -20;
+                    leaf.x = Math.random() * canvas.width;
+                }
+
+                ctx.save();
+                ctx.translate(leaf.x, leaf.y);
+                ctx.rotate((leaf.rotation * Math.PI) / 180);
+                ctx.fillStyle = `rgba(124, 154, 125, ${leaf.opacity})`;
+
+                // Simple Leaf Shape
+                ctx.beginPath();
+                ctx.ellipse(0, 0, leaf.size, leaf.size / 2, 0, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.restore();
+            });
+
+            requestAnimationFrame(animateLeaves);
+        }
+
+        window.onload = function() {
+            animateLeaves();
+            renderCalendar();
+        };
+
+        // -------------------------------------------------------------
+        // SIMULATED GOOGLE CALENDAR SCHEDULER WIDGET
+        // -------------------------------------------------------------
+        let currentYear = 2026;
+        let currentMonth = 9; // October (0-indexed: 0=Jan, 9=Oct)
+        let selectedDateStr = null;
+        let selectedTimeSlot = null;
+
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        // Sample available 15-minute slots for consultations
+        const availableSlots = [
+            "09:00 AM", "09:15 AM", "09:30 AM", "09:45 AM",
+            "10:15 AM", "10:30 AM", "11:00 AM", "11:15 AM",
+            "01:30 PM", "01:45 PM", "02:00 PM", "02:15 PM",
+            "03:30 PM", "03:45 PM", "04:00 PM"
+        ];
+
+        function changeMonth(delta) {
+            currentMonth += delta;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const monthYearLabel = document.getElementById('currentMonthYear');
+            monthYearLabel.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+            const grid = document.getElementById('calendarDaysGrid');
+            grid.innerHTML = '';
+
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            // Blank slots before 1st of month
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'h-9';
+                grid.appendChild(emptyCell);
+            }
+
+            // Days of month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayBtn = document.createElement('button');
+                dayBtn.type = 'button';
+                const dateString = `${monthNames[currentMonth]} ${day}, ${currentYear}`;
+                
+                // Highlight week days as available
+                const dayOfWeek = new Date(currentYear, currentMonth, day).getDay();
+                const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+
+                let baseClasses = "h-9 w-9 rounded-full text-xs font-medium flex items-center justify-center mx-auto transition-all ";
+
+                if (isWeekend) {
+                    baseClasses += "text-sage-300 cursor-not-allowed";
+                    dayBtn.disabled = true;
+                } else {
+                    if (selectedDateStr === dateString) {
+                        baseClasses += "bg-sage-600 text-white font-bold shadow";
+                    } else {
+                        baseClasses += "hover:bg-sage-100 text-sage-800 font-semibold";
+                    }
+                    dayBtn.onclick = () => selectDate(dateString);
+                }
+
+                dayBtn.className = baseClasses;
+                dayBtn.textContent = day;
+                grid.appendChild(dayBtn);
+            }
+        }
+
+        function selectDate(dateStr) {
+            selectedDateStr = dateStr;
+            renderCalendar();
+
+            document.getElementById('selectedDateLabel').innerHTML = `<strong>Selected Date:</strong> ${dateStr}`;
+            
+            const timeContainer = document.getElementById('timeSlotsContainer');
+            timeContainer.innerHTML = '';
+
+            // Render available 15-minute time slots
+            availableSlots.forEach(slot => {
+                const slotBtn = document.createElement('button');
+                slotBtn.type = 'button';
+                
+                let btnClasses = "w-full py-2 px-3 rounded-xl border text-xs font-semibold text-center transition-all flex items-center justify-between ";
+                
+                if (selectedTimeSlot === slot) {
+                    btnClasses += "border-sage-600 bg-sage-600 text-white shadow-sm";
+                } else {
+                    btnClasses += "border-sage-200 bg-white text-sage-800 hover:border-sage-400 hover:bg-sage-50";
+                }
+
+                slotBtn.className = btnClasses;
+                slotBtn.innerHTML = `
+                    <span>${slot}</span>
+                    <span class="text-[10px] opacity-80">15 min</span>
+                `;
+                slotBtn.onclick = () => selectTimeSlot(slot);
+                timeContainer.appendChild(slotBtn);
+            });
+        }
+
+        function selectTimeSlot(slot) {
+            selectedTimeSlot = slot;
+            // Refresh time slots list visual active state
+            selectDate(selectedDateStr);
+
+            // Reveal form details
+            const formContainer = document.getElementById('bookingDetailsForm');
+            formContainer.classList.remove('hidden');
+            formContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function cancelSlotSelection() {
+            selectedTimeSlot = null;
+            document.getElementById('bookingDetailsForm').classList.add('hidden');
+            if (selectedDateStr) selectDate(selectedDateStr);
+        }
+
+        function handleBookingSubmit(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('clientName').value;
+            const email = document.getElementById('clientEmail').value;
+
+            // Hide form and show confirmation
+            document.getElementById('bookingWidgetContent').classList.add('hidden');
+            document.getElementById('bookingDetailsForm').classList.add('hidden');
+
+            document.getElementById('confirmedEmail').textContent = email;
+            document.getElementById('confirmedDateTime').textContent = `${selectedDateStr} at ${selectedTimeSlot}`;
+            
+            const confirmBox = document.getElementById('bookingConfirmation');
+            confirmBox.classList.remove('hidden');
+            confirmBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function resetBookingWidget() {
+            selectedDateStr = null;
+            selectedTimeSlot = null;
+            document.getElementById('scheduleForm').reset();
+            
+            document.getElementById('bookingConfirmation').classList.add('hidden');
+            document.getElementById('bookingWidgetContent').classList.remove('hidden');
+            document.getElementById('selectedDateLabel').textContent = 'Please pick a date on the calendar';
+            document.getElementById('timeSlotsContainer').innerHTML = '<p class="text-xs text-sage-500 italic p-2">Select a highlighted date to see available 15-minute consultation slots.</p>';
+            renderCalendar();
+        }
+    </script>
+</body>
+</html>
