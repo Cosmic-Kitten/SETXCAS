@@ -94,7 +94,7 @@
                 <a href="#about" class="hover:text-sage-700 transition">About Therapy</a>
                 <a href="#consultation" class="hover:text-sage-700 transition">15-Min Consultation</a>
                 <a href="#faq" class="hover:text-sage-700 transition">FAQ</a>
-                <button onclick="openBookingModal()" class="bg-sage-700 hover:bg-sage-800 text-white px-5 py-2.5 rounded-full shadow-md transition transform hover:-translate-y-0.5">
+                <button onclick="document.getElementById('consultation').scrollIntoView({ behavior: 'smooth' });" class="bg-sage-700 hover:bg-sage-800 text-white px-5 py-2.5 rounded-full shadow-md transition transform hover:-translate-y-0.5">
                     Book Free Call
                 </button>
             </div>
@@ -163,34 +163,55 @@
             </div>
         </section>
 
-        <!-- Consultation Booking Section -->
+        <!-- Consultation Booking Section with Visual Calendar -->
         <section id="consultation" class="py-20 px-6 bg-sage-50 border-y border-sage-100">
             <div class="max-w-4xl mx-auto text-center space-y-4 mb-12">
                 <span class="text-sage-700 font-semibold text-sm uppercase tracking-wider">Schedule Online</span>
                 <h2 class="font-serif text-3xl md:text-4xl font-bold text-earth-900">Book Your 15-Minute 1st Time Meeting</h2>
                 <p class="text-earth-800 max-w-xl mx-auto">
-                    Select an available date and time below. No paperwork or forms required at the time of booking.
+                    Select a date on the calendar below to view available time slots. No paperwork or forms required.
                 </p>
             </div>
 
             <!-- Calendar & Booking Widget Container -->
-            <div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-md border border-sage-200 p-6 md:p-10">
-                <div class="flex flex-col md:flex-row justify-between items-center mb-8 pb-6 border-b border-sage-100 gap-4">
-                    <div>
-                        <h3 class="font-serif text-xl font-bold text-sage-900">Available Consultation Slots</h3>
-                        <p class="text-xs text-earth-600 mt-1">Pick a slot to instantly reserve.</p>
+            <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-md border border-sage-200 p-6 md:p-10">
+                <div class="grid md:grid-cols-2 gap-8 items-start">
+                    
+                    <!-- Left: Visual Calendar Widget -->
+                    <div class="bg-sage-50/60 p-6 rounded-2xl border border-sage-200">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 id="calendar-month-year" class="font-serif text-lg font-bold text-sage-900">November 2026</h3>
+                            <div class="flex space-x-2">
+                                <button onclick="changeMonth(-1)" class="w-8 h-8 rounded-full bg-white border border-sage-200 flex items-center justify-center text-sage-700 hover:bg-sage-100"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                                <button onclick="changeMonth(1)" class="w-8 h-8 rounded-full bg-white border border-sage-200 flex items-center justify-center text-sage-700 hover:bg-sage-100"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                            </div>
+                        </div>
+                        <!-- Days Header -->
+                        <div class="grid grid-cols-7 text-center text-xs font-semibold text-sage-700 mb-2">
+                            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                        </div>
+                        <!-- Days Grid -->
+                        <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 text-center text-sm">
+                            <!-- Populated dynamically -->
+                        </div>
                     </div>
+
+                    <!-- Right: Available Times for Selected Date -->
+                    <div class="space-y-4">
+                        <h3 class="font-serif text-xl font-bold text-sage-900">Available Times</h3>
+                        <p class="text-xs text-earth-600">Selected Date: <span id="selected-date-label" class="font-semibold text-sage-800">None selected</span></p>
+                        
+                        <div id="date-slots-container" class="space-y-3 max-h-64 overflow-y-auto pr-1">
+                            <div class="text-center py-10 text-earth-600 text-xs italic">
+                                Please click a date on the calendar to view available 15-minute slots.
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
-                <!-- Slots Grid / List -->
-                <div id="available-slots-container" class="grid sm:grid-cols-2 gap-4 mb-8">
-                    <div class="col-span-full text-center py-8 text-earth-600 text-sm">
-                        <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading available times...
-                    </div>
-                </div>
-
-                <!-- Booking Form -->
-                <div id="booking-form-card" class="hidden bg-earth-50 border border-sage-200 rounded-2xl p-6 mt-6">
+                <!-- Booking Form (Hidden until slot selected) -->
+                <div id="booking-form-card" class="hidden bg-earth-50 border border-sage-200 rounded-2xl p-6 mt-8">
                     <h4 class="font-serif text-lg font-bold text-sage-900 mb-2">Confirm Your 15-Min Intro Meeting</h4>
                     <p class="text-xs text-earth-600 mb-6">Selected Slot: <span id="selected-slot-display" class="font-semibold text-sage-800"></span></p>
                     
@@ -225,20 +246,57 @@
                     </div>
                     <h4 class="font-serif text-2xl font-bold text-sage-900">Consultation Booked Successfully!</h4>
                     <p class="text-sm text-earth-800 max-w-md mx-auto">
-                        Thank you! Your 15-minute consultation is confirmed for <span id="success-slot-time" class="font-semibold text-sage-900"></span>. Notifications have been sent.
+                        Thank you! Your 15-minute consultation is confirmed for <span id="success-slot-time" class="font-semibold text-sage-900"></span>. Notifications have been sent to Sean and test inbox (`thespacekitten26@gmail.com`).
                     </p>
-                    <div class="pt-4">
+                    <div class="pt-4 flex flex-wrap justify-center gap-4">
                         <a id="gcal-invite-link" href="#" target="_blank" class="bg-sage-700 hover:bg-sage-800 text-white font-medium px-6 py-3 rounded-xl text-sm transition inline-flex items-center space-x-2 shadow-sm">
                             <i class="fa-regular fa-calendar-plus"></i>
                             <span>Add to Google Calendar</span>
                         </a>
+                        <button onclick="resetBookingFlow()" class="border border-sage-200 hover:bg-sage-50 text-earth-800 font-medium px-6 py-3 rounded-xl text-sm transition">
+                            Book Another Time
+                        </button>
                     </div>
                 </div>
 
             </div>
         </section>
 
+        <!-- FAQ Section -->
+        <section id="faq" class="py-20 px-6 max-w-4xl mx-auto">
+            <div class="text-center space-y-4 mb-12">
+                <span class="text-sage-700 font-semibold text-sm uppercase tracking-wider">Common Questions</span>
+                <h2 class="font-serif text-3xl font-bold text-earth-900">Frequently Asked Questions</h2>
+            </div>
+            <div class="space-y-4">
+                <div class="bg-white border border-sage-200 rounded-2xl p-6 shadow-sm">
+                    <h3 class="font-serif text-lg font-bold text-sage-900 mb-2">Do I need to fill out paperwork before our first meeting?</h3>
+                    <p class="text-sm text-earth-800 leading-relaxed">No. For these short 15-minute introductory meetings, there is zero paperwork or forms required. The goal is simply to chat, see if we are a good fit, and discuss my therapy process.</p>
+                </div>
+            </div>
+        </section>
+
     </main>
+
+    <!-- Footer -->
+    <footer class="content-layer bg-earth-900 text-earth-100 py-12 px-6 border-t border-earth-800">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full bg-sage-700 text-white flex items-center justify-center">
+                    <i class="fa-solid fa-leaf text-sm"></i>
+                </div>
+                <span class="font-serif text-lg font-bold text-white">Sean Martin, LMFT</span>
+            </div>
+            <p class="text-xs text-earth-600 text-center">
+                &copy; 2026 Sean Martin Therapy Practice. All rights reserved.
+            </p>
+            <div class="flex items-center space-x-4 text-sm text-sage-300">
+                <button onclick="openAdminModal()" class="hover:text-white transition text-xs">
+                    <i class="fa-solid fa-lock mr-1"></i> Therapist Portal
+                </button>
+            </div>
+        </div>
+    </footer>
 
     <!-- Admin Sign-In Modal -->
     <div id="admin-signin-modal" class="fixed inset-0 z-50 bg-earth-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
@@ -267,19 +325,46 @@
     </div>
 
     <!-- Admin Dashboard Modal -->
-    <div id="admin-dashboard-modal" class="fixed inset-0 z-50 bg-earth-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl border border-sage-200 relative">
+    <div id="admin-dashboard-modal" class="fixed inset-0 z-50 bg-earth-900/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-3xl w-full p-6 md:p-8 shadow-2xl border border-sage-200 relative my-8">
             <div class="flex justify-between items-center pb-6 border-b border-sage-100 mb-6">
-                <h3 class="font-serif text-2xl font-bold text-sage-900">Manage Slots</h3>
-                <button onclick="closeAdminDashboard()" class="text-earth-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="space-y-4">
-                <div class="grid sm:grid-cols-2 gap-4">
-                    <input type="date" id="new-slot-date" class="px-4 py-2 rounded-xl border border-sage-200 text-sm">
-                    <input type="text" id="new-slot-time" placeholder="2:00 PM - 2:15 PM" class="px-4 py-2 rounded-xl border border-sage-200 text-sm">
+                <div>
+                    <span class="text-xs font-semibold text-sage-700 uppercase tracking-wider">Therapist Portal</span>
+                    <h3 class="font-serif text-2xl font-bold text-sage-900">Practice Management Dashboard</h3>
                 </div>
-                <button onclick="addNewSlot()" class="w-full bg-sage-700 text-white font-semibold py-2 rounded-xl text-sm">Add Slot</button>
-                <div id="admin-slots-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
+                <button onclick="closeAdminDashboard()" class="text-earth-600 hover:text-earth-900 text-xl p-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex space-x-2 border-b border-sage-100 mb-6 pb-2">
+                <button onclick="switchAdminTab('availability')" id="tab-btn-availability" class="px-4 py-2 rounded-xl text-xs font-semibold bg-sage-700 text-white transition">Manage Slots</button>
+                <button onclick="switchAdminTab('bookings')" id="tab-btn-bookings" class="px-4 py-2 rounded-xl text-xs font-semibold text-earth-700 hover:bg-sage-50 transition">Client Bookings</button>
+            </div>
+
+            <!-- Tab 1: Slots -->
+            <div id="tab-content-availability" class="space-y-6">
+                <div class="bg-sage-50 p-6 rounded-2xl border border-sage-200 space-y-4">
+                    <h4 class="font-serif text-lg font-bold text-sage-900">Add New 15-Minute Slot</h4>
+                    <div class="grid sm:grid-cols-3 gap-4">
+                        <input type="date" id="new-slot-date" class="px-4 py-2 rounded-xl border border-sage-200 text-sm bg-white">
+                        <input type="text" id="new-slot-time" placeholder="2:00 PM - 2:15 PM" class="px-4 py-2 rounded-xl border border-sage-200 text-sm bg-white">
+                        <button onclick="addNewSlot()" class="bg-sage-700 text-white font-semibold py-2 rounded-xl text-sm"><i class="fa-solid fa-plus mr-1"></i> Add Slot</button>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-serif text-lg font-bold text-sage-900 mb-4">Active Slots</h4>
+                    <div id="admin-slots-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Bookings -->
+            <div id="tab-content-bookings" class="space-y-4 hidden">
+                <h4 class="font-serif text-lg font-bold text-sage-900">Received Consultations</h4>
+                <div id="admin-bookings-list" class="space-y-3 max-h-96 overflow-y-auto"></div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-sage-100 flex justify-end">
+                <button onclick="closeAdminDashboard()" class="bg-earth-900 text-white px-6 py-2.5 rounded-xl text-xs font-semibold">Done</button>
             </div>
         </div>
     </div>
@@ -309,47 +394,105 @@
         }
         animateLeaves();
 
-        // Application State & Fallback Loading
+        // LocalStorage App State & Calendar Navigation State
         let selectedSlot = null;
-        let activeSlots = [
+        let selectedDateStr = null;
+        let currentMonthDate = new Date(2026, 10, 1); // November 2026 default
+
+        let activeSlots = JSON.parse(localStorage.getItem('sean_therapy_slots')) || [
             { id: 'slot-1', date: '2026-11-01', time: '10:00 AM - 10:15 AM', booked: false },
             { id: 'slot-2', date: '2026-11-01', time: '11:00 AM - 11:15 AM', booked: false },
             { id: 'slot-3', date: '2026-11-02', time: '2:00 PM - 2:15 PM', booked: false },
             { id: 'slot-4', date: '2026-11-03', time: '4:30 PM - 4:45 PM', booked: false }
         ];
 
+        let bookingsList = JSON.parse(localStorage.getItem('sean_therapy_bookings')) || [];
+
         window.addEventListener('DOMContentLoaded', () => {
             emailjs.init("yAOWUhW6zZ8xiQYGv");
-            renderSlots();
+            renderCalendar();
             renderAdminSlots();
+            renderAdminBookings();
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             document.getElementById('new-slot-date').value = tomorrow.toISOString().split('T')[0];
         });
 
-        function renderSlots() {
-            const container = document.getElementById('available-slots-container');
+        function saveState() {
+            localStorage.setItem('sean_therapy_slots', JSON.stringify(activeSlots));
+            localStorage.setItem('sean_therapy_bookings', JSON.stringify(bookingsList));
+        }
+
+        // Render Calendar Grid
+        function renderCalendar() {
+            const year = currentMonthDate.getFullYear();
+            const month = currentMonthDate.getMonth();
+            
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
+
+            const grid = document.getElementById('calendar-days-grid');
+            grid.innerHTML = '';
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            // Blank padding for previous month
+            for (let i = 0; i < firstDayIndex; i++) {
+                const blank = document.createElement('div');
+                grid.appendChild(blank);
+            }
+
+            // Days of month
+            for (let day = 1; day <= totalDays; day++) {
+                const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const hasSlots = activeSlots.some(s => s.date === dStr && !s.booked);
+                
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `h-9 w-9 mx-auto rounded-xl flex items-center justify-center text-xs font-medium transition relative ${selectedDateStr === dStr ? 'bg-sage-700 text-white font-bold shadow-md' : 'hover:bg-sage-100 text-earth-900'}`;
+                btn.innerText = day;
+                
+                if (hasSlots) {
+                    const dot = document.createElement('span');
+                    dot.className = `absolute bottom-1 w-1 h-1 rounded-full ${selectedDateStr === dStr ? 'bg-white' : 'bg-sage-700'}`;
+                    btn.appendChild(dot);
+                }
+
+                btn.onclick = () => selectDate(dStr);
+                grid.appendChild(btn);
+            }
+        }
+
+        function changeMonth(direction) {
+            currentMonthDate.setMonth(currentMonthDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function selectDate(dStr) {
+            selectedDateStr = dStr;
+            renderCalendar();
+            document.getElementById('selected-date-label').innerText = dStr;
+            
+            const container = document.getElementById('date-slots-container');
             container.innerHTML = '';
-            const available = activeSlots.filter(s => !s.booked);
-            if (available.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-8 text-earth-600 text-sm">All current consultation slots are booked.</div>`;
+
+            const daySlots = activeSlots.filter(s => s.date === dStr && !s.booked);
+            if (daySlots.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-earth-600 text-xs italic">No available 15-minute slots for ${dStr}. Please pick another date or add one via Admin.</div>`;
                 return;
             }
-            available.forEach(slot => {
+
+            daySlots.forEach(slot => {
                 const card = document.createElement('div');
-                card.className = `p-4 rounded-2xl border transition flex items-center justify-between cursor-pointer ${selectedSlot && selectedSlot.id === slot.id ? 'border-sage-700 bg-sage-50 shadow-sm' : 'border-sage-200 bg-white hover:border-sage-400'}`;
+                card.className = `p-3 rounded-xl border transition flex items-center justify-between cursor-pointer ${selectedSlot && selectedSlot.id === slot.id ? 'border-sage-700 bg-sage-50 shadow-sm' : 'border-sage-200 bg-white hover:border-sage-400'}`;
                 card.onclick = () => selectSlot(slot);
                 card.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-xl bg-sage-100 text-sage-700 flex items-center justify-center font-bold text-sm">
-                            <i class="fa-regular fa-calendar"></i>
-                        </div>
-                        <div>
-                            <p class="font-serif font-bold text-sage-900 text-sm">${slot.date}</p>
-                            <p class="text-xs text-earth-600">${slot.time}</p>
-                        </div>
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-regular fa-clock text-sage-700 text-xs"></i>
+                        <span class="font-serif font-bold text-sage-900 text-xs">${slot.time}</span>
                     </div>
-                    <span class="text-xs font-semibold px-3 py-1.5 rounded-full ${selectedSlot && selectedSlot.id === slot.id ? 'bg-sage-700 text-white' : 'bg-sage-100 text-sage-800'}">
+                    <span class="text-[10px] font-semibold px-2.5 py-1 rounded-full ${selectedSlot && selectedSlot.id === slot.id ? 'bg-sage-700 text-white' : 'bg-sage-100 text-sage-800'}">
                         ${selectedSlot && selectedSlot.id === slot.id ? 'Selected' : 'Select'}
                     </span>
                 `;
@@ -359,7 +502,7 @@
 
         function selectSlot(slot) {
             selectedSlot = slot;
-            renderSlots();
+            selectDate(slot.date);
             document.getElementById('selected-slot-display').innerText = `${slot.date} at ${slot.time}`;
             document.getElementById('booking-form-card').classList.remove('hidden');
             document.getElementById('booking-form-card').scrollIntoView({ behavior: 'smooth' });
@@ -368,7 +511,7 @@
         function cancelBookingSelection() {
             selectedSlot = null;
             document.getElementById('booking-form-card').classList.add('hidden');
-            renderSlots();
+            if (selectedDateStr) selectDate(selectedDateStr);
         }
 
         async function handleBookingSubmit(event) {
@@ -377,12 +520,23 @@
 
             const name = document.getElementById('client-name').value;
             const email = document.getElementById('client-email').value;
+            const phone = document.getElementById('client-phone').value;
 
             const btn = document.getElementById('submit-booking-btn');
             btn.innerHTML = 'Confirming...';
             btn.disabled = true;
 
             selectedSlot.booked = true;
+            const bookingRecord = {
+                clientName: name,
+                clientEmail: email,
+                clientPhone: phone,
+                date: selectedSlot.date,
+                time: selectedSlot.time,
+                timestamp: new Date().toLocaleString()
+            };
+            bookingsList.push(bookingRecord);
+            saveState();
 
             try {
                 await emailjs.send('Quantum Studios', 'template_zl8ctdc', {
@@ -403,46 +557,95 @@
             document.getElementById('booking-success-card').classList.remove('hidden');
             btn.innerHTML = 'Confirm & Get Calendar Invite';
             btn.disabled = false;
-            renderSlots();
+            renderCalendar();
+            renderAdminSlots();
+            renderAdminBookings();
+        }
+
+        function resetBookingFlow() {
+            selectedSlot = null;
+            document.getElementById('consultation-form').reset();
+            document.getElementById('booking-success-card').classList.add('hidden');
+            if (selectedDateStr) selectDate(selectedDateStr);
+            document.getElementById('consultation').scrollIntoView({ behavior: 'smooth' });
         }
 
         function openAdminModal() { document.getElementById('admin-signin-modal').classList.remove('hidden'); document.getElementById('admin-signin-modal').classList.add('flex'); }
         function closeAdminModal() { document.getElementById('admin-signin-modal').classList.add('hidden'); document.getElementById('admin-signin-modal').classList.remove('flex'); }
+        
         function handleAdminLogin(event) {
             event.preventDefault();
             if (document.getElementById('admin-user').value === 'sean' && document.getElementById('admin-pass').value === 'ABC123!@#') {
                 closeAdminModal();
+                document.getElementById('admin-user').value = '';
+                document.getElementById('admin-pass').value = '';
+                document.getElementById('login-error').classList.add('hidden');
                 document.getElementById('admin-dashboard-modal').classList.remove('hidden');
                 document.getElementById('admin-dashboard-modal').classList.add('flex');
             } else {
-                document.getElementById('login-error').innerText = 'Incorrect credentials.';
+                document.getElementById('login-error').innerText = 'Incorrect username or password.';
                 document.getElementById('login-error').classList.remove('hidden');
             }
         }
         function closeAdminDashboard() { document.getElementById('admin-dashboard-modal').classList.add('hidden'); document.getElementById('admin-dashboard-modal').classList.remove('flex'); }
+
+        function switchAdminTab(tab) {
+            ['availability', 'bookings'].forEach(t => {
+                document.getElementById(`tab-content-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).className = 'px-4 py-2 rounded-xl text-xs font-semibold text-earth-700 hover:bg-sage-50 transition';
+            });
+            document.getElementById(`tab-content-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tab}`).className = 'px-4 py-2 rounded-xl text-xs font-semibold bg-sage-700 text-white transition';
+        }
+
         function renderAdminSlots() {
             const list = document.getElementById('admin-slots-list');
             list.innerHTML = '';
+            if (activeSlots.length === 0) {
+                list.innerHTML = '<p class="text-xs text-earth-600">No slots added yet.</p>';
+                return;
+            }
             activeSlots.forEach(slot => {
                 const item = document.createElement('div');
-                item.className = 'p-2 border rounded flex justify-between items-center text-xs';
-                item.innerHTML = `<span>${slot.date} - ${slot.time} (${slot.booked ? 'Booked' : 'Available'})</span><button onclick="deleteSlot('${slot.id}')" class="text-red-600 font-semibold">Delete</button>`;
+                item.className = 'p-3 border rounded-xl flex justify-between items-center text-xs bg-white';
+                item.innerHTML = `<span><b>${slot.date}</b> at ${slot.time} (${slot.booked ? 'Booked' : 'Available'})</span><button onclick="deleteSlot('${slot.id}')" class="text-red-600 font-semibold px-2 py-1">Delete</button>`;
                 list.appendChild(item);
             });
         }
+
         function addNewSlot() {
             const date = document.getElementById('new-slot-date').value;
             const time = document.getElementById('new-slot-time').value;
             if (!date || !time) return;
             activeSlots.push({ id: 'slot-' + Date.now(), date, time, booked: false });
             document.getElementById('new-slot-time').value = '';
+            saveState();
             renderAdminSlots();
-            renderSlots();
+            renderCalendar();
+            if (selectedDateStr === date) selectDate(date);
         }
+
         function deleteSlot(id) {
             activeSlots = activeSlots.filter(s => s.id !== id);
+            saveState();
             renderAdminSlots();
-            renderSlots();
+            renderCalendar();
+            if (selectedDateStr) selectDate(selectedDateStr);
+        }
+
+        function renderAdminBookings() {
+            const list = document.getElementById('admin-bookings-list');
+            list.innerHTML = '';
+            if (bookingsList.length === 0) {
+                list.innerHTML = '<p class="text-xs text-earth-600">No client bookings yet.</p>';
+                return;
+            }
+            bookingsList.forEach(b => {
+                const item = document.createElement('div');
+                item.className = 'p-4 rounded-2xl border border-sage-200 bg-sage-50 text-xs space-y-1';
+                item.innerHTML = `<p><b>${b.clientName}</b> (${b.clientEmail})</p><p class="text-sage-700 font-semibold">${b.date} at ${b.time}</p><p class="text-[10px] text-earth-600">Booked on: ${b.timestamp}</p>`;
+                list.appendChild(item);
+            });
         }
     </script>
 </body>
