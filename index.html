@@ -1,12 +1,23 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sean Martin, LMFT | 15-Minute Intro Therapy Consultations</title>
-
-    <!-- Tailwind CSS -->
+    <title>Sean Martin, LMFT | Therapy Consultations</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        window.firebaseAppModules = { initializeApp, getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, getDocs, deleteDoc };
+    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -14,1252 +25,831 @@
                     colors: {
                         sage: {
                             50: '#f4f7f4',
-                            100: '#e3ebe3',
-                            200: '#c8d7c8',
-                            300: '#a3bfa3',
-                            400: '#7a9f7a',
-                            500: '#5c835c',
-                            600: '#476847',
-                            700: '#3a533a',
-                            800: '#304330',
-                            900: '#283828',
+                            100: '#e3eae3',
+                            200: '#c7d6c7',
+                            300: '#a3bba3',
+                            600: '#5c7a5c',
+                            700: '#486148',
+                            800: '#3a4e3a',
+                            900: '#2f3e2f',
                         },
-                        sand: '#fcfaf7',
-                        warmCream: '#f7f3ec',
-                        eucalyptus: '#2c4a3e',
-                        earth: '#8c7a6b'
+                        earth: {
+                            50: '#fbf9f6',
+                            100: '#f3ede2',
+                            600: '#8c7a6b',
+                            800: '#594d43',
+                            900: '#3d342c'
+                        }
                     },
                     fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif']
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['Lora', 'serif'],
                     }
                 }
             }
         }
     </script>
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #fcfaf7;
-            color: #283828;
+            background-color: #fbf9f6;
+            color: #3d342c;
             overflow-x: hidden;
         }
-        .serif-title {
-            font-family: 'Playfair Display', serif;
+        h1, h2, h3, .font-serif {
+            font-family: 'Lora', serif;
         }
-        canvas#leafCanvas {
+        .hero-bg {
+            background: linear-gradient(135deg, rgba(72, 97, 72, 0.92) 0%, rgba(47, 62, 47, 0.95) 100%), url('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&w=2000&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        canvas {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
-            z-index: 0;
-            opacity: 0.6;
+            z-index: 1;
         }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(200, 215, 200, 0.5);
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f4f7f4;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #a3bfa3;
-            border-radius: 4px;
+        .content-layer {
+            position: relative;
+            z-index: 10;
         }
     </style>
 </head>
-<body class="relative min-h-screen flex flex-col justify-between">
+<body class="bg-earth-50 text-earth-900 min-h-screen flex flex-col selection:bg-sage-200">
 
-    <!-- Leaf Motion Animation Canvas -->
+    <!-- Floating Leaves Canvas Animation -->
     <canvas id="leafCanvas"></canvas>
 
-    <!-- Admin Banner (Visible when logged in as Sean) -->
-    <div id="adminTopBanner" class="hidden bg-eucalyptus text-white px-4 py-2 text-xs font-semibold flex items-center justify-between sticky top-0 z-50 shadow-md">
-        <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Therapist Portal Active: Signed in as <strong>Sean Martin</strong></span>
-        </div>
-        <div class="flex items-center gap-3">
-            <button onclick="toggleAdminEditPanel()" class="bg-sage-600 hover:bg-sage-500 text-white px-3 py-1 rounded-lg transition-colors flex items-center gap-1">
-                <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
-                <span>Manage Schedule & Site Data</span>
-            </button>
-            <button onclick="handleSignOut()" class="text-sage-200 hover:text-white underline text-xs">
-                Sign Out
-            </button>
-        </div>
-    </div>
-
     <!-- Navigation Bar -->
-    <header class="sticky top-0 z-40 bg-sand/90 backdrop-blur-md border-b border-sage-100 transition-all">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-            <a href="#" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 rounded-full bg-sage-100 border border-sage-300 flex items-center justify-center text-sage-700 group-hover:bg-sage-200 transition-colors">
-                    <i data-lucide="sprout" class="w-5 h-5"></i>
+    <nav class="content-layer sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-sage-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="#" class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-sage-700 text-white flex items-center justify-center shadow-md">
+                    <i class="fa-solid fa-leaf text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="serif-title font-bold text-lg sm:text-xl text-sage-900 leading-tight">Sean Martin, LMFT</h1>
-                    <p class="text-xs text-sage-600 font-medium">Licensed Marriage & Family Therapist</p>
+                    <span id="nav-brand-title" class="font-serif text-xl font-bold tracking-tight text-sage-900">Sean Martin, LMFT</span>
+                    <span class="block text-xs text-sage-600 font-medium tracking-wider uppercase">Calming Therapy Practice</span>
                 </div>
             </a>
-
-            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-sage-800">
-                <a href="#about" class="hover:text-sage-600 transition-colors">About Sean</a>
-                <a href="#process" class="hover:text-sage-600 transition-colors">No Paperwork Process</a>
-                <a href="#booking" class="hover:text-sage-600 transition-colors">Book Consultation</a>
-                <a href="#faq" class="hover:text-sage-600 transition-colors">FAQ</a>
-            </nav>
-
-            <div class="hidden md:flex items-center gap-3">
-                <button onclick="openLoginModal()" id="navLoginBtn" class="px-4 py-2 rounded-full text-xs font-semibold text-sage-800 border border-sage-300 hover:bg-sage-100 transition-colors flex items-center gap-1.5">
-                    <i data-lucide="lock" class="w-3.5 h-3.5"></i>
-                    <span id="navLoginBtnText">Therapist Sign In</span>
+            <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-earth-800">
+                <a href="#about" class="hover:text-sage-700 transition">About Therapy</a>
+                <a href="#consultation" class="hover:text-sage-700 transition">15-Min Consultation</a>
+                <a href="#faq" class="hover:text-sage-700 transition">FAQ</a>
+                <button onclick="openBookingModal()" class="bg-sage-700 hover:bg-sage-800 text-white px-5 py-2.5 rounded-full shadow-md transition transform hover:-translate-y-0.5">
+                    Book Free Call
                 </button>
-                <a href="#booking" class="px-5 py-2.5 rounded-full text-xs font-semibold bg-sage-700 hover:bg-sage-800 text-white shadow-sm hover:shadow transition-all flex items-center gap-2">
-                    <i data-lucide="calendar" class="w-4 h-4"></i>
-                    <span>15-Min Intro Call</span>
-                </a>
             </div>
-
-            <!-- Mobile menu button -->
-            <button onclick="toggleMobileMenu()" class="md:hidden text-sage-800 p-2">
-                <i data-lucide="menu" class="w-6 h-6"></i>
-            </button>
-        </div>
-
-        <!-- Mobile Dropdown Navigation -->
-        <div id="mobileMenu" class="hidden md:hidden border-t border-sage-100 bg-sand px-4 py-4 space-y-3 text-sm">
-            <a href="#about" onclick="toggleMobileMenu()" class="block text-sage-800 py-1">About Sean</a>
-            <a href="#process" onclick="toggleMobileMenu()" class="block text-sage-800 py-1">No Paperwork Process</a>
-            <a href="#booking" onclick="toggleMobileMenu()" class="block text-sage-800 py-1">Book Consultation</a>
-            <a href="#faq" onclick="toggleMobileMenu()" class="block text-sage-800 py-1">FAQ</a>
-            <div class="pt-2 border-t border-sage-100 flex flex-col gap-2">
-                <button onclick="openLoginModal(); toggleMobileMenu();" class="w-full py-2 text-xs font-semibold text-sage-800 border border-sage-300 rounded-full">
-                    Therapist Portal Login
+            <div class="flex items-center space-x-4">
+                <button onclick="openAdminModal()" class="text-xs text-sage-600 hover:text-sage-800 font-semibold px-3 py-1.5 rounded border border-sage-200 hover:bg-sage-50 transition">
+                    <i class="fa-solid fa-lock mr-1"></i> Admin
                 </button>
-                <a href="#booking" onclick="toggleMobileMenu()" class="w-full text-center py-2 text-xs font-semibold bg-sage-700 text-white rounded-full">
-                    Book 15-Min Intro Call
+                <button onclick="openBookingModal()" class="md:hidden bg-sage-700 text-white px-4 py-2 rounded-full text-sm">
+                    Book Call
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="content-layer hero-bg text-white py-24 md:py-32 px-6 relative">
+        <div class="max-w-4xl mx-auto text-center space-y-6">
+            <span class="inline-block bg-white/10 backdrop-blur-md border border-white/20 text-sage-100 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase">
+                Zero Paperwork • 15-Minute Intro Calls • Safe & Confidential
+            </span>
+            <h1 id="hero-headline" class="font-serif text-4xl md:text-6xl font-bold tracking-tight leading-tight">
+                A Gentle Space to Begin Your Healing Journey
+            </h1>
+            <p id="hero-subtitle" class="text-lg md:text-xl text-sage-100 max-w-2xl mx-auto font-light leading-relaxed">
+                Take a breath. No complicated intake forms or paperwork required upfront. Let’s connect for a relaxed 15-minute chat to see if we are a good fit.
+            </p>
+            <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#consultation" class="w-full sm:w-auto bg-white text-sage-900 hover:bg-sage-50 font-semibold px-8 py-4 rounded-full shadow-lg transition transform hover:-translate-y-0.5 text-center">
+                    Schedule 15-Min Consultation
+                </a>
+                <a href="#about" class="w-full sm:w-auto border border-white/40 hover:bg-white/10 text-white font-medium px-8 py-4 rounded-full transition text-center">
+                    Learn About My Approach
                 </a>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="relative z-10 flex-grow">
-
-        <!-- HERO SECTION -->
-        <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12 md:py-20">
-            <div class="grid lg:grid-cols-12 gap-12 items-center">
-                <div class="lg:col-span-7 space-y-6">
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sage-100/80 border border-sage-200 text-sage-800 text-xs font-medium">
-                        <i data-lucide="leaf" class="w-4 h-4 text-sage-600"></i>
-                        <span>Calming & Welcoming First Consultations</span>
+    <main class="content-layer flex-grow">
+        
+        <!-- About Section -->
+        <section id="about" class="py-20 px-6 max-w-5xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div class="inline-flex items-center space-x-2 text-sage-700 font-semibold text-sm uppercase tracking-wider">
+                        <i class="fa-solid fa-seedling"></i>
+                        <span>Philosophy & Approach</span>
                     </div>
-
-                    <h1 id="heroHeadlineText" class="serif-title text-3xl sm:text-4xl lg:text-5xl font-bold text-sage-900 leading-tight">
-                        Finding Peace & Clarity On Your Own Terms
-                    </h1>
-
-                    <p class="text-sage-700 text-base sm:text-lg leading-relaxed max-w-xl">
-                        A peaceful 15-minute introductory conversation to explain my therapeutic process, answer your questions, and see if we feel like a great fit for your mental wellness journey.
+                    <h2 class="font-serif text-3xl md:text-4xl font-bold text-earth-900">
+                        Finding the right therapist shouldn't feel exhausting.
+                    </h2>
+                    <p id="about-text-1" class="text-earth-800 leading-relaxed">
+                        I believe therapy starts with comfort and genuine human connection. My practice is designed around a calm, nature-inspired environment where you can slow down and feel heard without pressure.
                     </p>
-
-                    <!-- Feature Badges -->
-                    <div class="grid sm:grid-cols-3 gap-3 pt-2">
-                        <div class="p-3.5 rounded-2xl glass-panel border border-sage-200 text-left">
-                            <i data-lucide="shield-check" class="w-5 h-5 text-sage-600 mb-1"></i>
-                            <h2 class="text-xs font-bold text-sage-900">Zero Paperwork</h2>
-                            <p class="text-[11px] text-sage-600">No forms required to book</p>
+                    <p id="about-text-2" class="text-earth-800 leading-relaxed">
+                        These initial 15-minute consultations are entirely informal. There are no clinical evaluations or tedious intake questionnaires. It is simply an opportunity for us to talk, for me to explain my therapeutic process, and for you to gauge how comfortable you feel working with me.
+                    </p>
+                    <div class="pt-2 grid grid-cols-2 gap-4 text-sm font-semibold text-sage-800">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check text-sage-600"></i>
+                            <span>100% Free Consultation</span>
                         </div>
-                        <div class="p-3.5 rounded-2xl glass-panel border border-sage-200 text-left">
-                            <i data-lucide="clock" class="w-5 h-5 text-sage-600 mb-1"></i>
-                            <h2 class="text-xs font-bold text-sage-900">15-Min Duration</h2>
-                            <p class="text-[11px] text-sage-600">Short & unhurried intro call</p>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check text-sage-600"></i>
+                            <span>No Paperwork Required</span>
                         </div>
-                        <div class="p-3.5 rounded-2xl glass-panel border border-sage-200 text-left">
-                            <i data-lucide="calendar-check" class="w-5 h-5 text-sage-600 mb-1"></i>
-                            <h2 class="text-xs font-bold text-sage-900">Google Calendar</h2>
-                            <p class="text-[11px] text-sage-600">Instant direct invite link</p>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check text-sage-600"></i>
+                            <span>Google Calendar Integration</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-check text-sage-600"></i>
+                            <span>Calm, Safe Atmosphere</span>
                         </div>
                     </div>
+                </div>
+                <div class="bg-sage-100 p-8 rounded-3xl border border-sage-200 shadow-sm relative overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 text-sage-200/50 text-9xl pointer-events-none">
+                        <i class="fa-solid fa-leaf"></i>
+                    </div>
+                    <h3 class="font-serif text-2xl font-bold text-sage-900 mb-4">Why a 15-Minute Chat?</h3>
+                    <ul class="space-y-4 text-earth-800">
+                        <li class="flex items-start space-x-3">
+                            <div class="w-6 h-6 rounded-full bg-sage-700 text-white flex items-center justify-center shrink-0 mt-0.5 text-xs">1</div>
+                            <p><strong>Mutual Fit:</strong> Therapy is deeply personal. You deserve to feel confident in your therapist.</p>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <div class="w-6 h-6 rounded-full bg-sage-700 text-white flex items-center justify-center shrink-0 mt-0.5 text-xs">2</div>
+                            <p><strong>Zero Friction:</strong> Skip the forms. Just pick a time that works on Google Calendar and show up.</p>
+                        </li>
+                        <li class="flex items-start space-x-3">
+                            <div class="w-6 h-6 rounded-full bg-sage-700 text-white flex items-center justify-center shrink-0 mt-0.5 text-xs">3</div>
+                            <p><strong>Clear Guidance:</strong> I will walk you through my process so you know exactly what to expect.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
-                    <div class="flex flex-wrap items-center gap-4 pt-4">
-                        <a href="#booking" class="px-7 py-3.5 bg-sage-700 hover:bg-sage-800 text-white font-semibold rounded-full shadow-md hover:shadow-lg transition-all flex items-center gap-2">
-                            <i data-lucide="calendar" class="w-4 h-4"></i>
-                            <span>Schedule Intro Consultation</span>
-                        </a>
-                        <a href="#about" class="px-6 py-3.5 border border-sage-300 text-sage-800 font-semibold rounded-full hover:bg-sage-100 transition-all flex items-center gap-2">
-                            <span>Learn About Sean</span>
-                            <i data-lucide="arrow-down" class="w-4 h-4 text-sage-600"></i>
-                        </a>
+        <!-- Consultation Booking Section -->
+        <section id="consultation" class="py-20 px-6 bg-sage-50 border-y border-sage-100">
+            <div class="max-w-4xl mx-auto text-center space-y-4 mb-12">
+                <span class="text-sage-700 font-semibold text-sm uppercase tracking-wider">Schedule Online</span>
+                <h2 class="font-serif text-3xl md:text-4xl font-bold text-earth-900">Book Your 15-Minute 1st Time Meeting</h2>
+                <p class="text-earth-800 max-w-xl mx-auto">
+                    Select an available date and time below. No paperwork or forms required at the time of booking.
+                </p>
+            </div>
+
+            <!-- Calendar & Booking Widget Container -->
+            <div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-md border border-sage-200 p-6 md:p-10">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-8 pb-6 border-b border-sage-100 gap-4">
+                    <div>
+                        <h3 class="font-serif text-xl font-bold text-sage-900">Available Consultation Slots</h3>
+                        <p class="text-xs text-earth-600 mt-1">Times sync in real-time. Pick a slot to instantly reserve.</p>
+                    </div>
+                    <div class="flex items-center space-x-2 bg-sage-50 px-4 py-2 rounded-full border border-sage-200 text-xs text-sage-800 font-medium">
+                        <i class="fa-brands fa-google text-sage-700"></i>
+                        <span>Google Calendar Synchronized</span>
                     </div>
                 </div>
 
-                <!-- Hero Nature Card -->
-                <div class="lg:col-span-5">
-                    <div class="relative mx-auto max-w-md bg-gradient-to-b from-sage-100 to-warmCream p-6 rounded-3xl border border-sage-200 shadow-xl overflow-hidden">
-                        <div class="absolute top-0 right-0 p-6 opacity-10">
-                            <i data-lucide="trees" class="w-40 h-40 text-sage-900"></i>
-                        </div>
-                        
-                        <div class="relative z-10 space-y-4">
-                            <div class="w-20 h-20 rounded-2xl bg-sage-200 border-2 border-white shadow-sm flex items-center justify-center text-sage-800">
-                                <i data-lucide="user" class="w-10 h-10"></i>
-                            </div>
+                <!-- Slots Grid / List -->
+                <div id="available-slots-container" class="grid sm:grid-cols-2 gap-4 mb-8">
+                    <!-- Populated dynamically -->
+                    <div class="col-span-full text-center py-8 text-earth-600 text-sm">
+                        <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading available times...
+                    </div>
+                </div>
 
+                <!-- Booking Form (Hidden until slot selected) -->
+                <div id="booking-form-card" class="hidden bg-earth-50 border border-sage-200 rounded-2xl p-6 mt-6">
+                    <h4 class="font-serif text-lg font-bold text-sage-900 mb-2">Confirm Your 15-Min Intro Meeting</h4>
+                    <p class="text-xs text-earth-600 mb-6">Selected Slot: <span id="selected-slot-display" class="font-semibold text-sage-800"></span></p>
+                    
+                    <form id="consultation-form" onsubmit="handleBookingSubmit(event)" class="space-y-4">
+                        <div class="grid sm:grid-cols-2 gap-4">
                             <div>
-                                <h2 class="serif-title font-bold text-2xl text-sage-900">Sean Martin, LMFT</h2>
-                                <p class="text-xs text-sage-600 font-medium">Licensed Marriage & Family Therapist</p>
+                                <label class="block text-xs font-semibold text-earth-800 uppercase mb-1">Your Name</label>
+                                <input type="text" id="client-name" required class="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:border-sage-700 text-sm bg-white" placeholder="Jane Doe">
                             </div>
-
-                            <p class="text-xs text-sage-700 leading-relaxed italic bg-white/70 p-3.5 rounded-xl border border-sage-100">
-                                "My goal is to create a serene, supportive environment where you feel heard from the very first minute, without any administrative pressure."
-                            </p>
-
-                            <div class="pt-2 border-t border-sage-200 flex items-center justify-between text-xs text-sage-700">
-                                <span class="flex items-center gap-1">
-                                    <i data-lucide="mail" class="w-3.5 h-3.5 text-sage-600"></i>
-                                    <a id="seanEmailLink" href="mailto:sean.martin@setxcas.com" class="hover:underline font-medium text-sage-900"><span id="seanEmailLabel">sean.martin@setxcas.com</span></a>
-                                </span>
-                                <span class="flex items-center gap-1 text-emerald-700 font-semibold">
-                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                    <span>Accepting Clients</span>
-                                </span>
+                            <div>
+                                <label class="block text-xs font-semibold text-earth-800 uppercase mb-1">Email Address</label>
+                                <input type="email" id="client-email" required class="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:border-sage-700 text-sm bg-white" placeholder="jane@example.com">
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PROCESS SECTION: NO PAPERWORK -->
-        <section id="process" class="py-16 bg-warmCream/60 border-y border-sage-100">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6">
-                <div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
-                    <h2 class="serif-title text-2xl sm:text-3xl font-bold text-sage-900">Simple, Unhurried Consultation Process</h2>
-                    <p class="text-sage-700 text-sm">Booking your first call shouldn't feel like filling out tax forms. Here is how simple we keep it:</p>
-                </div>
-
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-2xl border border-sage-200 shadow-sm relative space-y-3">
-                        <div class="w-10 h-10 rounded-xl bg-sage-100 text-sage-800 font-bold flex items-center justify-center text-sm">
-                            1
-                        </div>
-                        <h3 class="font-bold text-sage-900 text-base">Pick a 15-Minute Slot</h3>
-                        <p class="text-xs text-sage-600 leading-relaxed">
-                            Select a date and time that suits your schedule from my real-time updated Google Calendar availability below.
-                        </p>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl border border-sage-200 shadow-sm relative space-y-3">
-                        <div class="w-10 h-10 rounded-xl bg-sage-100 text-sage-800 font-bold flex items-center justify-center text-sm">
-                            2
-                        </div>
-                        <h3 class="font-bold text-sage-900 text-base">No Forms or Paperwork</h3>
-                        <p class="text-xs text-sage-600 leading-relaxed">
-                            Clients do not fill out intake forms at the time of booking. Just provide your name, email, and phone number so we can connect.
-                        </p>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl border border-sage-200 shadow-sm relative space-y-3">
-                        <div class="w-10 h-10 rounded-xl bg-sage-100 text-sage-800 font-bold flex items-center justify-center text-sm">
-                            3
-                        </div>
-                        <h3 class="font-bold text-sage-900 text-base">Comfortable Intro Call</h3>
-                        <p class="text-xs text-sage-600 leading-relaxed">
-                            We discuss my therapy process, address your goals, and evaluate if we are a good fit for working together.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ABOUT SEAN SECTION -->
-        <section id="about" class="py-16 max-w-6xl mx-auto px-4 sm:px-6">
-            <div class="grid md:grid-cols-12 gap-10 items-center">
-                <div class="md:col-span-5">
-                    <div class="p-8 bg-sage-100/60 rounded-3xl border border-sage-200 text-center space-y-4">
-                        <div class="w-24 h-24 rounded-full bg-sage-200 border-4 border-white mx-auto flex items-center justify-center text-sage-700 shadow-md">
-                            <i data-lucide="flower-2" class="w-12 h-12"></i>
                         </div>
                         <div>
-                            <h3 class="serif-title text-xl font-bold text-sage-900">Sean Martin, LMFT</h3>
-                            <p class="text-xs text-sage-600 font-semibold">Therapy & Counseling Practice</p>
+                            <label class="block text-xs font-semibold text-earth-800 uppercase mb-1">Phone Number (Optional)</label>
+                            <input type="tel" id="client-phone" class="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:border-sage-700 text-sm bg-white" placeholder="(555) 000-0000">
                         </div>
-                        <div class="p-4 bg-white/80 rounded-2xl text-xs text-sage-700 space-y-2 border border-sage-200">
-                            <p class="flex items-center justify-between">
-                                <span class="font-semibold">Format:</span> 
-                                <span>Google Calendar / Phone Call</span>
-                            </p>
-                            <p class="flex items-center justify-between">
-                                <span class="font-semibold">First Consultation:</span> 
-                                <span class="font-bold text-sage-800">15 Minutes (Free)</span>
-                            </p>
-                            <p class="flex items-center justify-between">
-                                <span class="font-semibold">Paperwork:</span> 
-                                <span class="text-emerald-700 font-bold">None Required</span>
-                            </p>
+                        <div>
+                            <label class="block text-xs font-semibold text-earth-800 uppercase mb-1">Anything brief you'd like to share? (Optional)</label>
+                            <textarea id="client-message" rows="2" class="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:border-sage-700 text-sm bg-white" placeholder="Brief note..."></textarea>
                         </div>
-                    </div>
-                </div>
-
-                <div class="md:col-span-7 space-y-4">
-                    <span class="text-xs font-bold uppercase tracking-wider text-sage-600">About My Approach</span>
-                    <h2 class="serif-title text-3xl font-bold text-sage-900 leading-snug">A Grounded, Calming Environment For Your Growth</h2>
-                    <p id="aboutBioText" class="text-sm text-sage-700 leading-relaxed">
-                        I believe therapy should feel accessible, genuine, and unhurried. Too often, people feel hesitant to reach out because of lengthy intake paperwork or cold clinical barriers. My practice is centered around nature-inspired, calming conversations where you can express yourself freely.
-                    </p>
-                    <p class="text-sm text-sage-700 leading-relaxed">
-                        During our initial 15-minute consultation, my priority is simply getting to know you, answering any questions you have about my therapeutic style, and helping you decide with total confidence if I am the right guide for your journey.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <!-- BOOKING SECTION -->
-        <section id="booking" class="py-16 bg-sage-900 text-white relative overflow-hidden">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
-                <div class="text-center max-w-2xl mx-auto mb-10 space-y-2">
-                    <span class="px-3 py-1 rounded-full bg-sage-800 text-sage-200 text-xs font-semibold border border-sage-700">Interactive Booking Calendar</span>
-                    <h2 class="serif-title text-3xl font-bold text-white">Select Your 15-Minute Consultation Time</h2>
-                    <p class="text-sage-300 text-xs sm:text-sm">Pick a date and available slot. No paperwork required upon booking.</p>
-                </div>
-
-                <div class="bg-white text-sage-900 rounded-3xl p-6 sm:p-8 shadow-2xl border border-sage-200 max-w-4xl mx-auto">
-                    <div id="bookingStepContainer">
-                        <div class="grid lg:grid-cols-12 gap-8">
-                            
-                            <!-- Calendar Picker -->
-                            <div class="lg:col-span-7 space-y-4">
-                                <div class="flex items-center justify-between border-b border-sage-100 pb-3">
-                                    <h3 id="currentMonthYear" class="font-bold text-sage-900 text-base">October 2026</h3>
-                                    <div class="flex items-center gap-1">
-                                        <button onclick="changeMonth(-1)" class="p-1.5 rounded-lg hover:bg-sage-100 text-sage-700 transition-colors">
-                                            <i data-lucide="chevron-left" class="w-5 h-5"></i>
-                                        </button>
-                                        <button onclick="changeMonth(1)" class="p-1.5 rounded-lg hover:bg-sage-100 text-sage-700 transition-colors">
-                                            <i data-lucide="chevron-right" class="w-5 h-5"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Weekday headers -->
-                                <div class="grid grid-cols-7 text-center text-xs font-bold text-sage-500 mb-1">
-                                    <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
-                                </div>
-
-                                <!-- Days Grid -->
-                                <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1.5">
-                                    <!-- Dynamic Days -->
-                                </div>
-                            </div>
-
-                            <!-- Available Slots -->
-                            <div class="lg:col-span-5 border-t lg:border-t-0 lg:border-l border-sage-200 pt-6 lg:pt-0 lg:pl-6 space-y-4">
-                                <h3 class="font-bold text-sage-900 text-sm flex items-center gap-2">
-                                    <i data-lucide="clock" class="w-4 h-4 text-sage-600"></i>
-                                    <span>Available 15-Min Slots</span>
-                                </h3>
-
-                                <p id="selectedDateLabel" class="text-xs text-sage-600 italic">Click a date on the calendar first</p>
-
-                                <div id="timeSlotsContainer" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1">
-                                    <!-- Dynamic Time Slots -->
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Client Contact Info Form -->
-                        <div id="bookingDetailsForm" class="hidden pt-6 border-t border-sage-200 mt-6">
-                            <h3 class="font-semibold text-sage-900 text-sm mb-4 flex items-center gap-2">
-                                <span class="w-6 h-6 rounded-full bg-sage-100 text-sage-800 text-xs flex items-center justify-center font-bold">3</span>
-                                <span>Provide Basic Contact Details (No forms or paperwork required)</span>
-                            </h3>
-
-                            <form id="scheduleForm" onsubmit="handleBookingSubmit(event)" class="space-y-4 max-w-xl">
-                                <div class="grid sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-xs font-semibold text-sage-800 mb-1">Your Full Name *</label>
-                                        <input type="text" id="clientName" required placeholder="Full Name" class="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:ring-2 focus:ring-sage-500 text-sm bg-sand">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-semibold text-sage-800 mb-1">Email Address *</label>
-                                        <input type="email" id="clientEmail" required placeholder="name@example.com" class="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:ring-2 focus:ring-sage-500 text-sm bg-sand">
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-xs font-semibold text-sage-800 mb-1">Phone Number *</label>
-                                    <input type="tel" id="clientPhone" required placeholder="(555) 000-0000" class="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:ring-2 focus:ring-sage-500 text-sm bg-sand">
-                                </div>
-
-                                <div>
-                                    <label class="block text-xs font-semibold text-sage-800 mb-1">Optional Note for Sean</label>
-                                    <textarea id="clientNotes" rows="2" placeholder="Anything specific you'd like to touch on during our 15-minute call?" class="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:ring-2 focus:ring-sage-500 text-sm bg-sand resize-none"></textarea>
-                                </div>
-
-                                <div class="flex items-center justify-between pt-2">
-                                    <button type="button" onclick="cancelSlotSelection()" class="text-xs text-sage-600 hover:text-sage-800 font-medium">
-                                        ← Select Different Time
-                                    </button>
-                                    <button type="submit" id="submitBookingBtn" class="px-7 py-3 bg-sage-700 hover:bg-sage-800 text-white font-semibold text-sm rounded-full shadow transition-all flex items-center gap-2">
-                                        <i data-lucide="send" class="w-4 h-4"></i>
-                                        <span id="submitBookingBtnText">Confirm Call & Email Sean</span>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Booking Confirmation View -->
-                    <div id="bookingConfirmation" class="hidden text-center py-8 space-y-4">
-                        <div class="w-16 h-16 rounded-full bg-sage-100 text-sage-600 mx-auto flex items-center justify-center">
-                            <i data-lucide="check-circle-2" class="w-10 h-10"></i>
-                        </div>
-                        <h3 class="serif-title text-2xl font-bold text-sage-900">Intro Call Booked & Email Sent!</h3>
-                        
-                        <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-medium">
-                            <i data-lucide="mail-check" class="w-4 h-4 text-emerald-600"></i>
-                            <span>Notification Dispatched to Sean Martin & Test Recipient</span>
-                        </div>
-
-                        <p class="text-sm text-sage-700 max-w-md mx-auto">
-                            A confirmation record has been logged and email notifications sent to <span id="confirmedEmail" class="font-semibold text-sage-900"></span> and Sean Martin.
-                        </p>
-
-                        <div class="p-4 bg-sand rounded-2xl border border-sage-200 max-w-md mx-auto text-xs text-sage-800 space-y-1.5 text-left">
-                            <p><strong>Service:</strong> 15-Minute Intro Consultation</p>
-                            <p><strong>Scheduled:</strong> <span id="confirmedDateTime"></span></p>
-                            <p><strong>Therapist:</strong> Sean Martin (sean.martin@setxcas.com)</p>
-                            <p><strong>Paperwork:</strong> None required for this intro meeting.</p>
-                        </div>
-                        
-                        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                            <a id="googleCalAddLink" target="_blank" href="#" class="px-6 py-3 bg-sage-700 hover:bg-sage-800 text-white text-xs font-semibold rounded-full shadow transition-colors flex items-center gap-2">
-                                <i data-lucide="calendar-plus" class="w-4 h-4"></i>
-                                <span>Add to Google Calendar</span>
-                            </a>
-                            <button onclick="resetBookingWidget()" class="px-5 py-3 border border-sage-300 text-sage-800 text-xs font-semibold rounded-full hover:bg-sage-100 transition-colors">
-                                Book Another Slot
+                        <div class="flex items-center justify-end space-x-3 pt-2">
+                            <button type="button" onclick="cancelBookingSelection()" class="px-5 py-2.5 rounded-xl border border-sage-200 text-xs font-semibold text-earth-700 hover:bg-white transition">Cancel</button>
+                            <button type="submit" id="submit-booking-btn" class="bg-sage-700 hover:bg-sage-800 text-white font-semibold px-6 py-2.5 rounded-xl text-xs transition shadow-sm">
+                                Confirm & Get Calendar Invite
                             </button>
                         </div>
+                    </form>
+                </div>
+
+                <!-- Success Confirmation State -->
+                <div id="booking-success-card" class="hidden text-center py-10 space-y-4">
+                    <div class="w-16 h-16 bg-sage-100 text-sage-700 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                    <h4 class="font-serif text-2xl font-bold text-sage-900">Consultation Booked Successfully!</h4>
+                    <p class="text-sm text-earth-800 max-w-md mx-auto">
+                        Thank you! Your 15-minute consultation is confirmed for <span id="success-slot-time" class="font-semibold text-sage-900"></span>. Notifications have been dispatched to Sean and your test inbox.
+                    </p>
+                    <div class="pt-4 flex flex-wrap justify-center gap-4">
+                        <a id="gcal-invite-link" href="#" target="_blank" class="bg-sage-700 hover:bg-sage-800 text-white font-medium px-6 py-3 rounded-xl text-sm transition inline-flex items-center space-x-2 shadow-sm">
+                            <i class="fa-regular fa-calendar-plus"></i>
+                            <span>Add to Google Calendar</span>
+                        </a>
+                        <button onclick="resetBookingFlow()" class="border border-sage-200 hover:bg-sage-50 text-earth-800 font-medium px-6 py-3 rounded-xl text-sm transition">
+                            Book Another Time
+                        </button>
                     </div>
                 </div>
+
             </div>
         </section>
 
-        <!-- FAQ SECTION -->
-        <section id="faq" class="py-16 max-w-4xl mx-auto px-4 sm:px-6">
-            <div class="text-center space-y-2 mb-10">
-                <h2 class="serif-title text-3xl font-bold text-sage-900">Frequently Asked Questions</h2>
-                <p class="text-xs text-sage-600">Everything you need to know before booking your intro call.</p>
+        <!-- FAQ Section -->
+        <section id="faq" class="py-20 px-6 max-w-4xl mx-auto">
+            <div class="text-center space-y-4 mb-12">
+                <span class="text-sage-700 font-semibold text-sm uppercase tracking-wider">Common Questions</span>
+                <h2 class="font-serif text-3xl font-bold text-earth-900">Frequently Asked Questions</h2>
             </div>
-
-            <div class="space-y-3">
-                <div class="bg-white rounded-2xl border border-sage-200 overflow-hidden shadow-sm">
-                    <button onclick="toggleFaq(1)" class="w-full p-4 text-left font-bold text-sm text-sage-900 flex items-center justify-between">
-                        <span>Do I need to fill out forms or paperwork before the intro call?</span>
-                        <i id="faqIcon-1" data-lucide="chevron-down" class="w-4 h-4 text-sage-500 transition-transform"></i>
-                    </button>
-                    <div id="faqAnswer-1" class="hidden px-4 pb-4 text-xs text-sage-700 leading-relaxed border-t border-sage-100 pt-3">
-                        No paperwork is required at the time of booking. These 15-minute first-time meetings are strictly designed for us to introduce ourselves, explain my therapy process, and ensure we are a great fit.
-                    </div>
+            <div class="space-y-4">
+                <div class="bg-white border border-sage-200 rounded-2xl p-6 shadow-sm">
+                    <h3 class="font-serif text-lg font-bold text-sage-900 mb-2">Do I need to fill out paperwork before our first meeting?</h3>
+                    <p class="text-sm text-earth-800 leading-relaxed">No. For these short 15-minute introductory meetings, there is zero paperwork or forms required. The goal is simply to chat, see if we are a good fit, and discuss my therapy process.</p>
                 </div>
-
-                <div class="bg-white rounded-2xl border border-sage-200 overflow-hidden shadow-sm">
-                    <button onclick="toggleFaq(2)" class="w-full p-4 text-left font-bold text-sm text-sage-900 flex items-center justify-between">
-                        <span>How does the Google Calendar integration work?</span>
-                        <i id="faqIcon-2" data-lucide="chevron-down" class="w-4 h-4 text-sage-500 transition-transform"></i>
-                    </button>
-                    <div id="faqAnswer-2" class="hidden px-4 pb-4 text-xs text-sage-700 leading-relaxed border-t border-sage-100 pt-3">
-                        Once you choose an available time slot and submit your contact info, you will receive a direct "Add to Google Calendar" link that populates the event directly onto your calendar.
-                    </div>
+                <div class="bg-white border border-sage-200 rounded-2xl p-6 shadow-sm">
+                    <h3 class="font-serif text-lg font-bold text-sage-900 mb-2">How do these 15-minute consultations take place?</h3>
+                    <p class="text-sm text-earth-800 leading-relaxed">When you book, you receive a Google Calendar invite with a secure meeting link or phone contact details, making it seamless to connect.</p>
                 </div>
-
-                <div class="bg-white rounded-2xl border border-sage-200 overflow-hidden shadow-sm">
-                    <button onclick="toggleFaq(3)" class="w-full p-4 text-left font-bold text-sm text-sage-900 flex items-center justify-between">
-                        <span>Is there any charge for the 15-minute consultation?</span>
-                        <i id="faqIcon-3" data-lucide="chevron-down" class="w-4 h-4 text-sage-500 transition-transform"></i>
-                    </button>
-                    <div id="faqAnswer-3" class="hidden px-4 pb-4 text-xs text-sage-700 leading-relaxed border-t border-sage-100 pt-3">
-                        No, initial 15-minute introductory consultation calls are completely complimentary with no financial obligation.
-                    </div>
+                <div class="bg-white border border-sage-200 rounded-2xl p-6 shadow-sm">
+                    <h3 class="font-serif text-lg font-bold text-sage-900 mb-2">What happens after the consultation?</h3>
+                    <p class="text-sm text-earth-800 leading-relaxed">If we both feel that working together is a good fit, we can schedule your first full session and go over any standard onboarding details at that time.</p>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- FOOTER -->
-    <footer class="bg-sand border-t border-sage-200 py-10 relative z-10 text-xs text-sage-700">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-sage-200 flex items-center justify-center text-sage-800">
-                    <i data-lucide="sprout" class="w-4 h-4"></i>
+    <!-- Footer -->
+    <footer class="content-layer bg-earth-900 text-earth-100 py-12 px-6 border-t border-earth-800">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-full bg-sage-700 text-white flex items-center justify-center">
+                    <i class="fa-solid fa-leaf text-sm"></i>
                 </div>
-                <div>
-                    <p class="font-bold text-sage-900">Sean Martin, LMFT</p>
-                    <p class="text-[11px] text-sage-600">Licensed Marriage & Family Therapist</p>
-                </div>
+                <span class="font-serif text-lg font-bold text-white">Sean Martin, LMFT</span>
             </div>
-
-            <div class="text-center sm:text-right space-y-1">
-                <p>Primary Email: <a id="footerEmailLink" href="mailto:sean.martin@setxcas.com" class="font-semibold text-sage-900 hover:underline">sean.martin@setxcas.com</a></p>
-                <p class="text-[10px] text-sage-500">© 2026 Sean Martin Therapy. All rights reserved.</p>
+            <p class="text-xs text-earth-600 text-center">
+                &copy; 2026 Sean Martin Therapy Practice. All rights reserved. Calming nature-inspired therapy.
+            </p>
+            <div class="flex items-center space-x-4 text-sm text-sage-300">
+                <button onclick="openAdminModal()" class="hover:text-white transition text-xs">
+                    <i class="fa-solid fa-lock mr-1"></i> Therapist Portal
+                </button>
             </div>
         </div>
     </footer>
 
-    <!-- THERAPIST LOGIN MODAL -->
-    <div id="loginModal" class="hidden fixed inset-0 z-50 bg-sage-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl border border-sage-200 space-y-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2 text-sage-900">
-                    <i data-lucide="lock" class="w-5 h-5 text-sage-600"></i>
-                    <h3 class="font-bold text-base">Therapist Sign In</h3>
+    <!-- Admin Sign-In Modal -->
+    <div id="admin-signin-modal" class="fixed inset-0 z-50 bg-earth-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-sage-200 relative animate-in fade-in zoom-in-95 duration-200">
+            <button onclick="closeAdminModal()" class="absolute top-6 right-6 text-earth-600 hover:text-earth-900 text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 bg-sage-100 text-sage-700 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+                    <i class="fa-solid fa-shield-halved"></i>
                 </div>
-                <button onclick="closeLoginModal()" class="text-sage-400 hover:text-sage-700">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
+                <h3 class="font-serif text-2xl font-bold text-sage-900">Therapist Sign In</h3>
+                <p class="text-xs text-earth-600 mt-1">Enter credentials to manage availability and site settings.</p>
             </div>
-
-            <p class="text-xs text-sage-600">Log in as Sean Martin to manage availability slots and update website copy.</p>
-
-            <form onsubmit="handleLoginSubmit(event)" class="space-y-3">
+            <form onsubmit="handleAdminLogin(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-sage-800 mb-1">Username</label>
-                    <input type="text" id="loginUsername" required placeholder="Username" class="w-full px-3.5 py-2.5 rounded-xl border border-sage-300 text-xs focus:ring-2 focus:ring-sage-500 bg-sand">
+                    <label class="block text-xs font-semibold text-earth-800 uppercase mb-1">Username</label>
+                    <input type="text" id="admin-user" required class="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:border-sage-700 text-sm" placeholder="sean">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-sage-800 mb-1">Password</label>
-                    <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-sage-300 text-xs focus:ring-2 focus:ring-sage-500 bg-sand">
+                    <label class="block text-xs font-semibold text-earth-800 uppercase mb-1">Password</label>
+                    <input type="password" id="admin-pass" required class="w-full px-4 py-2.5 rounded-xl border border-sage-200 focus:outline-none focus:border-sage-700 text-sm" placeholder="••••••••••">
                 </div>
-
-                <div id="loginErrorAlert" class="hidden text-xs text-rose-600 bg-rose-50 p-2.5 rounded-xl border border-rose-200 font-medium">
-                    Invalid credentials. Username is 'sean' and password is 'ABC123!@#'.
-                </div>
-
-                <button type="submit" class="w-full py-2.5 bg-sage-700 hover:bg-sage-800 text-white font-semibold text-xs rounded-xl shadow transition-all">
-                    Sign In
+                <div id="login-error" class="text-xs text-red-600 hidden font-medium text-center"></div>
+                <button type="submit" class="w-full bg-sage-700 hover:bg-sage-800 text-white font-semibold py-3 rounded-xl text-sm transition shadow-sm">
+                    Sign In to Dashboard
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- THERAPIST ADMIN DRAWER / DASHBOARD -->
-    <div id="adminEditDrawer" class="hidden fixed inset-0 z-50 bg-sage-900/60 backdrop-blur-sm flex justify-end">
-        <div class="bg-white w-full max-w-3xl h-full shadow-2xl p-6 sm:p-8 overflow-y-auto custom-scrollbar space-y-6">
-            <div class="flex items-center justify-between border-b border-sage-200 pb-4">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-lg bg-sage-100 flex items-center justify-center text-sage-800">
-                        <i data-lucide="settings" class="w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-sage-900 text-lg">Therapist Control Panel</h3>
-                        <p class="text-xs text-sage-600">Changes sync live to Firestore for all site visitors</p>
-                    </div>
+    <!-- Admin Dashboard Modal -->
+    <div id="admin-dashboard-modal" class="fixed inset-0 z-50 bg-earth-900/60 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-4xl w-full p-6 md:p-8 shadow-2xl border border-sage-200 relative my-8">
+            <div class="flex justify-between items-center pb-6 border-b border-sage-100 mb-6">
+                <div>
+                    <span class="text-xs font-semibold text-sage-700 uppercase tracking-wider">Therapist Portal</span>
+                    <h3 class="font-serif text-2xl font-bold text-sage-900">Practice Management Dashboard</h3>
                 </div>
-                <button onclick="toggleAdminEditPanel()" class="text-sage-500 hover:text-sage-800 p-2">
-                    <i data-lucide="x" class="w-6 h-6"></i>
+                <button onclick="closeAdminDashboard()" class="text-earth-600 hover:text-earth-900 text-xl p-2">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <!-- Schedule Slot Manager -->
-            <div class="bg-sand p-5 rounded-2xl border border-sage-200 space-y-3">
-                <h4 class="font-bold text-sage-900 text-sm flex items-center gap-2">
-                    <i data-lucide="clock" class="w-4 h-4 text-sage-600"></i>
-                    <span>Manage 15-Minute Consultation Time Slots</span>
-                </h4>
-                <p class="text-xs text-sage-600">Add or remove standard time slots offered to prospective clients.</p>
+            <!-- Dashboard Tabs -->
+            <div class="flex space-x-2 border-b border-sage-100 mb-6 pb-2">
+                <button onclick="switchAdminTab('availability')" id="tab-btn-availability" class="px-4 py-2 rounded-xl text-xs font-semibold bg-sage-700 text-white transition">
+                    Manage Slots
+                </button>
+                <button onclick="switchAdminTab('bookings')" id="tab-btn-bookings" class="px-4 py-2 rounded-xl text-xs font-semibold text-earth-700 hover:bg-sage-50 transition">
+                    Client Bookings
+                </button>
+                <button onclick="switchAdminTab('settings')" id="tab-btn-settings" class="px-4 py-2 rounded-xl text-xs font-semibold text-earth-700 hover:bg-sage-50 transition">
+                    Settings & Emails
+                </button>
+            </div>
 
-                <div class="flex gap-2">
-                    <input type="text" id="newTimeSlotInput" placeholder="e.g. 01:30 PM" class="px-3 py-2 text-xs rounded-xl border border-sage-300 focus:ring-2 focus:ring-sage-500 bg-white flex-grow">
-                    <button onclick="addCustomTimeSlot()" class="px-4 py-2 bg-sage-700 text-white text-xs font-semibold rounded-xl hover:bg-sage-800">
-                        Add Slot
-                    </button>
+            <!-- Tab 1: Availability -->
+            <div id="tab-content-availability" class="space-y-6">
+                <div class="bg-sage-50 p-6 rounded-2xl border border-sage-200 space-y-4">
+                    <h4 class="font-serif text-lg font-bold text-sage-900">Add New 15-Minute Consultation Slot</h4>
+                    <div class="grid sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-earth-800 uppercase mb-1">Date</label>
+                            <input type="date" id="new-slot-date" class="w-full px-4 py-2 rounded-xl border border-sage-200 text-sm bg-white">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-earth-800 uppercase mb-1">Time</label>
+                            <input type="text" id="new-slot-time" placeholder="e.g. 2:00 PM - 2:15 PM" class="w-full px-4 py-2 rounded-xl border border-sage-200 text-sm bg-white">
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="addNewSlot()" class="w-full bg-sage-700 hover:bg-sage-800 text-white font-semibold py-2 rounded-xl text-sm transition">
+                                <i class="fa-solid fa-plus mr-1"></i> Add Slot
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <div id="adminSlotList" class="flex flex-wrap gap-2 pt-2">
-                    <!-- Dynamic slots rendered here -->
+                <div>
+                    <h4 class="font-serif text-lg font-bold text-sage-900 mb-4">Current Active Slots (Live for All Visitors)</h4>
+                    <div id="admin-slots-list" class="space-y-3 max-h-60 overflow-y-auto pr-2">
+                        <!-- Populated dynamically -->
+                    </div>
                 </div>
             </div>
 
-            <!-- Profile & Email Settings Editor -->
-            <div class="bg-sand p-5 rounded-2xl border border-sage-200 space-y-3">
-                <h4 class="font-bold text-sage-900 text-sm flex items-center gap-2">
-                    <i data-lucide="user-cog" class="w-4 h-4 text-sage-600"></i>
-                    <span>Profile Info & Notification Recipient Settings</span>
-                </h4>
+            <!-- Tab 2: Bookings -->
+            <div id="tab-content-bookings" class="space-y-4 hidden">
+                <h4 class="font-serif text-lg font-bold text-sage-900">Received Consultations</h4>
+                <div id="admin-bookings-list" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
 
-                <div class="space-y-3">
+            <!-- Tab 3: Settings -->
+            <div id="tab-content-settings" class="space-y-6 hidden">
+                <div class="bg-sage-50 p-6 rounded-2xl border border-sage-200 space-y-4">
+                    <h4 class="font-serif text-lg font-bold text-sage-900">Email Notification Settings</h4>
+                    <p class="text-xs text-earth-600">Configured with EmailJS (Service ID: <code>Quantum Studios</code>, Template: <code>template_zl8ctdc</code>).</p>
                     <div>
-                        <label class="block text-xs font-semibold text-sage-700 mb-1">Hero Tagline</label>
-                        <input type="text" id="adminTaglineInput" class="w-full px-3 py-2 text-xs rounded-xl border border-sage-300 focus:ring-2 focus:ring-sage-500 bg-white">
+                        <label class="block text-xs font-semibold text-earth-800 uppercase mb-1">Test Recipient Email (for testing notifications)</label>
+                        <input type="email" id="setting-test-email" value="thespacekitten26@gmail.com" class="w-full px-4 py-2.5 rounded-xl border border-sage-200 text-sm bg-white">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-sage-700 mb-1">Therapist Primary Email (Sean)</label>
-                        <input type="email" id="adminEmailInput" class="w-full px-3 py-2 text-xs rounded-xl border border-sage-300 focus:ring-2 focus:ring-sage-500 bg-white">
+                        <label class="block text-xs font-semibold text-earth-800 uppercase mb-1">Therapist Primary Email</label>
+                        <input type="email" id="setting-therapist-email" value="sean.martin@setxcas.com" class="w-full px-4 py-2.5 rounded-xl border border-sage-200 text-sm bg-white">
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-sage-700 mb-1">Test Recipient Email (Receives Test Copy)</label>
-                        <input type="email" id="adminTestEmailInput" placeholder="test.email@example.com" class="w-full px-3 py-2 text-xs rounded-xl border border-sage-300 focus:ring-2 focus:ring-sage-500 bg-white">
-                        <span class="text-[10px] text-sage-500">Notifications are dispatched to BOTH Sean and this test recipient upon every booking.</span>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-sage-700 mb-1">About Sean Bio</label>
-                        <textarea id="adminBioInput" rows="3" class="w-full px-3 py-2 text-xs rounded-xl border border-sage-300 focus:ring-2 focus:ring-sage-500 bg-white resize-none"></textarea>
-                    </div>
-                    <button onclick="saveAdminProfileChanges()" class="w-full py-2.5 bg-sage-700 hover:bg-sage-800 text-white font-semibold text-xs rounded-xl transition-all flex items-center justify-center gap-2">
-                        <i data-lucide="save" class="w-4 h-4"></i>
-                        <span>Save Profile & Sync Globally</span>
+                    <button onclick="saveAdminSettings()" class="bg-sage-700 hover:bg-sage-800 text-white font-semibold px-6 py-2.5 rounded-xl text-xs transition">
+                        Save Settings
                     </button>
                 </div>
             </div>
 
-            <!-- Client Bookings Dashboard -->
-            <div class="bg-sand p-5 rounded-2xl border border-sage-200 space-y-3">
-                <div class="flex items-center justify-between border-b border-sage-200 pb-2">
-                    <h4 class="font-bold text-sage-900 text-sm flex items-center gap-2">
-                        <i data-lucide="users" class="w-4 h-4 text-sage-600"></i>
-                        <span>Client Consultation Bookings Log</span>
-                    </h4>
-                    <button onclick="fetchBookingsFromFirebase()" class="text-xs text-sage-600 hover:text-sage-800 flex items-center gap-1 font-semibold">
-                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh Log
-                    </button>
-                </div>
-
-                <div id="adminBookingsTableContainer" class="overflow-x-auto">
-                    <p class="text-xs text-sage-500 italic">Click refresh to load recent client consultation bookings.</p>
-                </div>
+            <div class="mt-8 pt-6 border-t border-sage-100 flex justify-end">
+                <button onclick="closeAdminDashboard()" class="bg-earth-900 hover:bg-earth-800 text-white px-6 py-2.5 rounded-xl text-xs font-semibold transition">
+                    Done
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- FIREBASE MODULE INTEGRATION -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, collection, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global Firebase configuration
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sean-martin-therapy';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyDemoKeyOnlyForFallbackExecution",
-            authDomain: "sean-martin-therapy.firebaseapp.com",
-            projectId: "sean-martin-therapy",
-            storageBucket: "sean-martin-therapy.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:demo"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        let currentUser = null;
-
-        async function initAuth() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.warn("Auth initialization fallback:", err);
-            }
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                listenToGlobalSiteConfig();
-                listenToGlobalSlots();
-            }
-        });
-
-        initAuth();
-
-        // Strict paths adhering to RULE 1
-        const configDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'siteConfig', 'general');
-        const slotsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'schedule', 'availableSlots');
-        const bookingsColRef = collection(db, 'artifacts', appId, 'public', 'data', 'consultations');
-
-        function listenToGlobalSiteConfig() {
-            onSnapshot(configDocRef, (snap) => {
-                if (snap.exists()) {
-                    window.siteContent = { ...window.siteContent, ...snap.data() };
-                    window.applySiteContentUpdates();
-                }
-            }, (error) => console.log("Config snapshot log:", error));
-        }
-
-        function listenToGlobalSlots() {
-            onSnapshot(slotsDocRef, (snap) => {
-                if (snap.exists() && snap.data().slots) {
-                    window.availableTimeSlots = snap.data().slots;
-                    if (window.selectedDay) window.selectDate(window.selectedDay);
-                    if (window.isAdminLoggedIn) window.renderAdminSlotsList();
-                }
-            }, (error) => console.log("Slots snapshot log:", error));
-        }
-
-        window.saveAdminProfileChangesGlobal = async function(updatedContent) {
-            if (!currentUser) return;
-            try {
-                await setDoc(configDocRef, updatedContent, { merge: true });
-                window.siteContent = updatedContent;
-                window.applySiteContentUpdates();
-                alert('Site information updated globally!');
-            } catch (err) {
-                console.error("Error saving profile:", err);
-                localStorage.setItem('sean_therapy_content', JSON.stringify(updatedContent));
-                alert('Saved locally.');
-            }
-        };
-
-        window.saveTimeSlotsGlobal = async function(slots) {
-            if (!currentUser) return;
-            try {
-                await setDoc(slotsDocRef, { slots: slots }, { merge: true });
-            } catch (err) {
-                console.error("Error saving slots:", err);
-                localStorage.setItem('sean_therapy_slots', JSON.stringify(slots));
-            }
-        };
-
-        window.recordBookingInFirebase = async function(bookingData) {
-            if (!currentUser) return;
-            try {
-                await addDoc(bookingsColRef, {
-                    ...bookingData,
-                    createdAt: new Date().toISOString()
-                });
-            } catch (err) {
-                console.error("Error logging booking:", err);
-            }
-        };
-
-        window.fetchBookingsFromFirebase = async function() {
-            const container = document.getElementById('adminBookingsTableContainer');
-            if (!container) return;
-            
-            try {
-                const snapshot = await getDocs(bookingsColRef);
-                if (snapshot.empty) {
-                    container.innerHTML = '<p class="text-xs text-sage-500 italic">No bookings recorded yet.</p>';
-                    return;
-                }
-
-                let html = `
-                    <table class="w-full text-left text-xs text-sage-800">
-                        <thead class="bg-sage-100 text-sage-900 border-b border-sage-200">
-                            <tr>
-                                <th class="p-2.5">Date & Time</th>
-                                <th class="p-2.5">Client Name</th>
-                                <th class="p-2.5">Phone</th>
-                                <th class="p-2.5">Email</th>
-                                <th class="p-2.5">Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-sage-100 bg-white">
-                `;
-
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    html += `
-                        <tr class="hover:bg-sand">
-                            <td class="p-2.5 font-bold text-sage-900">${data.dateTime || 'N/A'}</td>
-                            <td class="p-2.5">${data.clientName || 'N/A'}</td>
-                            <td class="p-2.5">${data.clientPhone || 'N/A'}</td>
-                            <td class="p-2.5 text-sage-600">${data.clientEmail || 'N/A'}</td>
-                            <td class="p-2.5 max-w-xs truncate">${data.notes || 'None'}</td>
-                        </tr>
-                    `;
-                });
-
-                html += `</tbody></table>`;
-                container.innerHTML = html;
-            } catch (err) {
-                console.error("Error loading bookings:", err);
-                container.innerHTML = '<p class="text-xs text-rose-500 italic">Error loading records.</p>';
-            }
-        };
-    </script>
-
-    <!-- CORE JAVASCRIPT LOGIC -->
+    <!-- Application Script -->
     <script>
-        // EmailJS Initialization
-        (function() {
-            if (typeof emailjs !== 'undefined') {
-                emailjs.init("user_demo_sean_martin_therapy");
-            }
-        })();
+        // Leaf Particle Canvas Animation
+        const canvas = document.getElementById('leafCanvas');
+        const ctx = canvas.getContext('2d');
+        let leaves = [];
 
-        let isAdminLoggedIn = false;
-
-        window.availableTimeSlots = [
-            "09:00 AM", "09:30 AM", "10:00 AM", "11:15 AM", 
-            "01:00 PM", "02:00 PM", "03:30 PM"
-        ];
-
-        window.siteContent = {
-            tagline: "Finding Peace & Clarity On Your Own Terms",
-            email: "sean.martin@setxcas.com",
-            testEmail: "test.notification@example.com",
-            bio: "I believe therapy should feel accessible, genuine, and unhurried. Too often, people feel hesitant to reach out because of lengthy intake paperwork or cold clinical barriers. My practice is centered around nature-inspired, calming conversations where you can express yourself freely."
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadStoredAdminData();
-            lucide.createIcons();
-            initCalendar();
-            checkAdminSession();
-            initLeafCanvas();
-        });
-
-        function loadStoredAdminData() {
-            const storedSlots = localStorage.getItem('sean_therapy_slots');
-            if (storedSlots) {
-                try { window.availableTimeSlots = JSON.parse(storedSlots); } catch(e){}
-            }
-            const storedContent = localStorage.getItem('sean_therapy_content');
-            if (storedContent) {
-                try { window.siteContent = JSON.parse(storedContent); } catch(e){}
-            }
-            applySiteContentUpdates();
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        function checkAdminSession() {
-            if (sessionStorage.getItem('sean_admin_authenticated') === 'true') {
-                isAdminLoggedIn = true;
-                showAdminUI();
-            }
-        }
-
-        window.applySiteContentUpdates = function() {
-            if (window.siteContent.tagline) {
-                const headline = document.getElementById('heroHeadlineText');
-                if (headline) headline.innerText = window.siteContent.tagline;
-            }
-            if (window.siteContent.email) {
-                const emailLabel = document.getElementById('seanEmailLabel');
-                if (emailLabel) emailLabel.innerText = window.siteContent.email;
-                const emailLink = document.getElementById('seanEmailLink');
-                if (emailLink) emailLink.href = `mailto:${window.siteContent.email}`;
-                const footerEmail = document.getElementById('footerEmailLink');
-                if (footerEmail) {
-                    footerEmail.innerText = window.siteContent.email;
-                    footerEmail.href = `mailto:${window.siteContent.email}`;
-                }
-            }
-            if (window.siteContent.bio) {
-                const aboutBio = document.getElementById('aboutBioText');
-                if (aboutBio) aboutBio.innerText = window.siteContent.bio;
-            }
-        }
-
-        function openLoginModal() {
-            if (isAdminLoggedIn) {
-                toggleAdminEditPanel();
-            } else {
-                document.getElementById('loginModal').classList.remove('hidden');
-                document.getElementById('loginErrorAlert').classList.add('hidden');
-            }
-        }
-
-        function closeLoginModal() {
-            document.getElementById('loginModal').classList.add('hidden');
-        }
-
-        function handleLoginSubmit(event) {
-            event.preventDefault();
-            const user = document.getElementById('loginUsername').value.trim();
-            const pass = document.getElementById('loginPassword').value.trim();
-
-            if (user === 'sean' && pass === 'ABC123!@#') {
-                isAdminLoggedIn = true;
-                sessionStorage.setItem('sean_admin_authenticated', 'true');
-                closeLoginModal();
-                showAdminUI();
-                document.getElementById('loginUsername').value = '';
-                document.getElementById('loginPassword').value = '';
-            } else {
-                document.getElementById('loginErrorAlert').classList.remove('hidden');
-            }
-        }
-
-        function showAdminUI() {
-            document.getElementById('adminTopBanner').classList.remove('hidden');
-            document.getElementById('navLoginBtnText').innerText = 'Therapist Portal Active';
-            populateAdminInputs();
-            renderAdminSlotsList();
-            if (window.fetchBookingsFromFirebase) window.fetchBookingsFromFirebase();
-        }
-
-        function handleSignOut() {
-            isAdminLoggedIn = false;
-            sessionStorage.removeItem('sean_admin_authenticated');
-            document.getElementById('adminTopBanner').classList.add('hidden');
-            document.getElementById('adminEditDrawer').classList.add('hidden');
-            document.getElementById('navLoginBtnText').innerText = 'Therapist Sign In';
-        }
-
-        function toggleAdminEditPanel() {
-            const drawer = document.getElementById('adminEditDrawer');
-            drawer.classList.toggle('hidden');
-        }
-
-        function populateAdminInputs() {
-            document.getElementById('adminTaglineInput').value = window.siteContent.tagline || '';
-            document.getElementById('adminEmailInput').value = window.siteContent.email || '';
-            document.getElementById('adminTestEmailInput').value = window.siteContent.testEmail || '';
-            document.getElementById('adminBioInput').value = window.siteContent.bio || '';
-        }
-
-        window.renderAdminSlotsList = function() {
-            const list = document.getElementById('adminSlotList');
-            if (!list) return;
-            list.innerHTML = '';
-            
-            if (!window.availableTimeSlots || window.availableTimeSlots.length === 0) {
-                list.innerHTML = '<span class="text-xs text-sage-400 italic">No slots added yet.</span>';
-                return;
-            }
-
-            window.availableTimeSlots.forEach((slot, idx) => {
-                const tag = document.createElement('div');
-                tag.className = 'px-2.5 py-1 bg-white border border-sage-300 text-sage-800 text-xs rounded-lg flex items-center gap-1.5 shadow-sm';
-                tag.innerHTML = `
-                    <span class="font-semibold">${slot}</span>
-                    <button onclick="removeTimeSlot(${idx})" class="text-rose-500 hover:text-rose-700 ml-1">
-                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                    </button>
-                `;
-                list.appendChild(tag);
-            });
-            lucide.createIcons();
-        }
-
-        function addCustomTimeSlot() {
-            const val = document.getElementById('newTimeSlotInput').value.trim();
-            if (val) {
-                window.availableTimeSlots.push(val);
-                if (window.saveTimeSlotsGlobal) window.saveTimeSlotsGlobal(window.availableTimeSlots);
-                document.getElementById('newTimeSlotInput').value = '';
-                renderAdminSlotsList();
-                if (selectedDay) selectDate(selectedDay);
-            }
-        }
-
-        function removeTimeSlot(index) {
-            window.availableTimeSlots.splice(index, 1);
-            if (window.saveTimeSlotsGlobal) window.saveTimeSlotsGlobal(window.availableTimeSlots);
-            renderAdminSlotsList();
-            if (selectedDay) selectDate(selectedDay);
-        }
-
-        function saveAdminProfileChanges() {
-            const updated = {
-                tagline: document.getElementById('adminTaglineInput').value.trim(),
-                email: document.getElementById('adminEmailInput').value.trim(),
-                testEmail: document.getElementById('adminTestEmailInput').value.trim(),
-                bio: document.getElementById('adminBioInput').value.trim()
-            };
-
-            if (window.saveAdminProfileChangesGlobal) {
-                window.saveAdminProfileChangesGlobal(updated);
-            } else {
-                window.siteContent = updated;
-                applySiteContentUpdates();
-                alert('Updated profile locally.');
-            }
-        }
-
-        function toggleMobileMenu() {
-            document.getElementById('mobileMenu').classList.toggle('hidden');
-        }
-
-        function toggleFaq(id) {
-            const ans = document.getElementById(`faqAnswer-${id}`);
-            const icon = document.getElementById(`faqIcon-${id}`);
-            if (ans.classList.contains('hidden')) {
-                ans.classList.remove('hidden');
-                icon.classList.add('rotate-180');
-            } else {
-                ans.classList.add('hidden');
-                icon.classList.remove('rotate-180');
-            }
-        }
-
-        // CALENDAR WIDGET
-        let currentYear = 2026;
-        let currentMonth = 9; // October (0-indexed)
-        let selectedDay = null;
-        let selectedTime = null;
-
-        const monthNames = [
-            "January", "February", "March", "April", "May", "June", 
-            "July", "August", "September", "October", "November", "December"
-        ];
-
-        function initCalendar() {
-            renderCalendar();
-        }
-
-        function changeMonth(delta) {
-            currentMonth += delta;
-            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-            else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-            selectedDay = null;
-            selectedTime = null;
-            document.getElementById('bookingDetailsForm').classList.add('hidden');
-            document.getElementById('timeSlotsContainer').innerHTML = '<p class="text-xs text-sage-500 italic p-2">Select a date on the calendar first.</p>';
-            document.getElementById('selectedDateLabel').innerText = 'Click a date on the calendar first';
-            renderCalendar();
-        }
-
-        function renderCalendar() {
-            document.getElementById('currentMonthYear').innerText = `${monthNames[currentMonth]} ${currentYear}`;
-            const grid = document.getElementById('calendarDaysGrid');
-            grid.innerHTML = '';
-
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-
-            for (let i = 0; i < firstDay; i++) {
-                grid.appendChild(document.createElement('div'));
-            }
-
-            for (let d = 1; d <= daysInMonth; d++) {
-                const dayBtn = document.createElement('button');
-                dayBtn.type = 'button';
-                dayBtn.innerText = d;
-                
-                const dayOfWeek = new Date(currentYear, currentMonth, d).getDay();
-                const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
-
-                let btnClasses = "h-9 w-9 rounded-full text-xs font-medium flex items-center justify-center mx-auto transition-all ";
-
-                if (isWeekend) {
-                    btnClasses += "text-sage-300 cursor-not-allowed ";
-                } else if (selectedDay === d) {
-                    btnClasses += "bg-sage-700 text-white shadow font-bold ";
-                } else {
-                    btnClasses += "hover:bg-sage-200 text-sage-800 bg-sand border border-sage-100 ";
-                }
-
-                dayBtn.className = btnClasses;
-                if (!isWeekend) dayBtn.onclick = () => selectDate(d);
-                grid.appendChild(dayBtn);
-            }
-        }
-
-        function selectDate(day) {
-            selectedDay = day;
-            selectedTime = null;
-            renderCalendar();
-
-            const formattedDate = `${monthNames[currentMonth]} ${day}, ${currentYear}`;
-            document.getElementById('selectedDateLabel').innerText = `Available times for ${formattedDate}:`;
-
-            const slotsContainer = document.getElementById('timeSlotsContainer');
-            slotsContainer.innerHTML = '';
-
-            if (!window.availableTimeSlots || window.availableTimeSlots.length === 0) {
-                slotsContainer.innerHTML = '<p class="text-xs text-rose-500 italic p-2">No slots available for this date.</p>';
-                return;
-            }
-
-            window.availableTimeSlots.forEach(slot => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = "w-full p-2.5 text-xs text-left rounded-xl border border-sage-200 hover:border-sage-500 hover:bg-sage-50 text-sage-800 font-semibold transition-all flex items-center justify-between";
-                btn.innerHTML = `
-                    <span>${slot} (15 mins)</span>
-                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-sage-400"></i>
-                `;
-                btn.onclick = () => selectTimeSlot(slot, btn);
-                slotsContainer.appendChild(btn);
-            });
-
-            document.getElementById('bookingDetailsForm').classList.add('hidden');
-            lucide.createIcons();
-        }
-
-        function selectTimeSlot(slot, btnElement) {
-            selectedTime = slot;
-            const allSlots = document.getElementById('timeSlotsContainer').children;
-            for (let child of allSlots) {
-                child.className = "w-full p-2.5 text-xs text-left rounded-xl border border-sage-200 hover:border-sage-500 hover:bg-sage-50 text-sage-800 font-semibold transition-all flex items-center justify-between";
-            }
-            btnElement.className = "w-full p-2.5 text-xs text-left rounded-xl border-2 border-sage-700 bg-sage-100 text-sage-900 font-bold transition-all flex items-center justify-between shadow-sm";
-            document.getElementById('bookingDetailsForm').classList.remove('hidden');
-        }
-
-        function cancelSlotSelection() {
-            selectedTime = null;
-            document.getElementById('bookingDetailsForm').classList.add('hidden');
-            if (selectedDay) selectDate(selectedDay);
-        }
-
-        async function handleBookingSubmit(event) {
-            event.preventDefault();
-
-            const clientName = document.getElementById('clientName').value.trim();
-            const clientEmail = document.getElementById('clientEmail').value.trim();
-            const clientPhone = document.getElementById('clientPhone').value.trim();
-            const clientNotes = document.getElementById('clientNotes').value.trim();
-
-            if (!selectedDay || !selectedTime) {
-                alert("Please select a date and time slot first.");
-                return;
-            }
-
-            const formattedDate = `${monthNames[currentMonth]} ${selectedDay}, ${currentYear}`;
-            const fullDateTimeStr = `${formattedDate} at ${selectedTime}`;
-
-            const submitBtn = document.getElementById('submitBookingBtn');
-            const submitBtnText = document.getElementById('submitBookingBtnText');
-            submitBtn.disabled = true;
-            submitBtnText.innerText = "Dispatching Notifications...";
-
-            const bookingData = {
-                clientName: clientName,
-                clientEmail: clientEmail,
-                clientPhone: clientPhone,
-                notes: clientNotes,
-                dateTime: fullDateTimeStr,
-                date: formattedDate,
-                time: selectedTime,
-                therapistEmail: window.siteContent.email || "sean.martin@setxcas.com",
-                testRecipientEmail: window.siteContent.testEmail || "test.notification@example.com"
-            };
-
-            // Log booking in Firestore
-            if (window.recordBookingInFirebase) {
-                await window.recordBookingInFirebase(bookingData);
-            }
-
-            // Send notification emails
-            const recipientEmails = [bookingData.therapistEmail, bookingData.testRecipientEmail].filter(Boolean);
-
-            if (typeof emailjs !== 'undefined') {
-                recipientEmails.forEach(recipient => {
-                    emailjs.send('default_service', 'consultation_booking_template', {
-                        to_email: recipient,
-                        client_name: clientName,
-                        client_email: clientEmail,
-                        client_phone: clientPhone,
-                        appointment_time: fullDateTimeStr,
-                        notes: clientNotes || "None provided"
-                    }).catch(err => console.log("EmailJS dispatch log:", err));
-                });
-            }
-
-            // Google Calendar link builder
-            const startTime = new Date(currentYear, currentMonth, selectedDay, 10, 0);
-            const endTime = new Date(startTime.getTime() + 15 * 60000);
-            const isoStart = startTime.toISOString().replace(/-|:|\.\d\d\d/g, "");
-            const isoEnd = endTime.toISOString().replace(/-|:|\.\d\d\d/g, "");
-            
-            const calTitle = encodeURIComponent("15-Min Intro Therapy Consultation - Sean Martin");
-            const calDetails = encodeURIComponent(`15-minute introductory call with Sean Martin, LMFT.\nClient: ${clientName}\nEmail: ${clientEmail}\nPhone: ${clientPhone}\nNotes: ${clientNotes || "None"}`);
-            const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calTitle}&dates=${isoStart}/${isoEnd}&details=${calDetails}`;
-
-            document.getElementById('googleCalAddLink').href = googleCalUrl;
-            document.getElementById('confirmedEmail').innerText = clientEmail;
-            document.getElementById('confirmedDateTime').innerText = fullDateTimeStr;
-
-            document.getElementById('bookingStepContainer').classList.add('hidden');
-            document.getElementById('bookingConfirmation').classList.remove('hidden');
-
-            submitBtn.disabled = false;
-            submitBtnText.innerText = "Confirm Call & Email Sean";
-        }
-
-        function resetBookingWidget() {
-            selectedDay = null;
-            selectedTime = null;
-            document.getElementById('bookingConfirmation').classList.add('hidden');
-            document.getElementById('bookingStepContainer').classList.remove('hidden');
-            document.getElementById('bookingDetailsForm').classList.add('hidden');
-            document.getElementById('scheduleForm').reset();
-            renderCalendar();
-            document.getElementById('selectedDateLabel').innerText = 'Click a date on the calendar first';
-            document.getElementById('timeSlotsContainer').innerHTML = '<p class="text-xs text-sage-500 italic p-2">Select a date on the calendar first.</p>';
-        }
-
-        // BACKGROUND LEAF CANVAS ANIMATION
-        function initLeafCanvas() {
-            const canvas = document.getElementById('leafCanvas');
-            const ctx = canvas.getContext('2d');
-
-            function resize() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            resize();
-            window.addEventListener('resize', resize);
-
-            const leaves = Array.from({ length: 18 }, () => ({
+        for (let i = 0; i < 18; i++) {
+            leaves.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
-                size: 8 + Math.random() * 12,
-                speedX: -0.3 + Math.random() * 0.6,
-                speedY: 0.2 + Math.random() * 0.5,
-                angle: Math.random() * Math.PI * 2,
-                spin: -0.01 + Math.random() * 0.02
-            }));
+                radius: Math.random() * 6 + 4,
+                speedX: Math.random() * 0.6 - 0.3,
+                speedY: Math.random() * 0.8 + 0.4,
+                rotation: Math.random() * 360,
+                rotationSpeed: Math.random() * 2 - 1,
+                opacity: Math.random() * 0.3 + 0.1
+            });
+        }
 
-            function drawLeaf(x, y, size, angle) {
+        function animateLeaves() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(92, 122, 92, 0.15)';
+            
+            leaves.forEach(leaf => {
                 ctx.save();
-                ctx.translate(x, y);
-                ctx.rotate(angle);
+                ctx.translate(leaf.x, leaf.y);
+                ctx.rotate((leaf.rotation * Math.PI) / 180);
+                ctx.globalAlpha = leaf.opacity;
+                
                 ctx.beginPath();
-                ctx.moveTo(0, -size);
-                ctx.quadraticCurveTo(size / 2, 0, 0, size);
-                ctx.quadraticCurveTo(-size / 2, 0, 0, -size);
-                ctx.fillStyle = 'rgba(163, 191, 163, 0.25)';
+                ctx.ellipse(0, 0, leaf.radius * 1.5, leaf.radius * 0.8, 0, 0, Math.PI * 2);
                 ctx.fill();
+                
                 ctx.restore();
+
+                leaf.x += leaf.speedX + Math.sin(leaf.y * 0.01) * 0.2;
+                leaf.y += leaf.speedY;
+                leaf.rotation += leaf.rotationSpeed;
+
+                if (leaf.y > canvas.height + 20) {
+                    leaf.y = -20;
+                    leaf.x = Math.random() * canvas.width;
+                }
+                if (leaf.x > canvas.width + 20) leaf.x = -20;
+                if (leaf.x < -20) leaf.x = canvas.width + 20;
+            });
+            requestAnimationFrame(animateLeaves);
+        }
+        animateLeaves();
+
+        // Firebase & Application State Initialization
+        let db = null;
+        let selectedSlot = null;
+        let siteConfig = {
+            testEmail: 'thespacekitten26@gmail.com',
+            therapistEmail: 'sean.martin@setxcas.com'
+        };
+
+        const defaultSlots = [
+            { id: 'slot-1', date: '2026-11-01', time: '10:00 AM - 10:15 AM', booked: false },
+            { id: 'slot-2', date: '2026-11-01', time: '11:00 AM - 11:15 AM', booked: false },
+            { id: 'slot-3', date: '2026-11-02', time: '2:00 PM - 2:15 PM', booked: false },
+            { id: 'slot-4', date: '2026-11-03', time: '4:30 PM - 4:45 PM', booked: false }
+        ];
+
+        let activeSlots = [...defaultSlots];
+        let bookingsList = [];
+
+        async function initFirebaseAndData() {
+            try {
+                if (window.firebaseAppModules) {
+                    const { initializeApp } = window.firebaseAppModules;
+                    const { getFirestore, doc, getDoc, setDoc, collection, getDocs } = window.firebaseAppModules;
+                    
+                    const firebaseConfig = {
+                        apiKey: "AIzaSyDummyKeyForCanvasApp98234",
+                        authDomain: "quantum-studios-demo.firebaseapp.com",
+                        projectId: "quantum-studios-demo",
+                        storageBucket: "quantum-studios-demo.appspot.com",
+                        messagingSenderId: "1234567890",
+                        appId: "1:1234567890:web:abcdef"
+                    };
+                    
+                    const app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    
+                    // Load slots from Firestore
+                    const slotsRef = collection(db, 'artifacts', 'sean-therapy-site', 'public', 'data', 'consultation_slots');
+                    const slotsSnapshot = await getDocs(slotsRef);
+                    if (!slotsSnapshot.empty) {
+                        activeSlots = [];
+                        slotsSnapshot.forEach(docSnap => {
+                            activeSlots.push({ id: docSnap.id, ...docSnap.data() });
+                        });
+                    } else {
+                        // Seed default slots
+                        for (let slot of defaultSlots) {
+                            await setDoc(doc(db, 'artifacts', 'sean-therapy-site', 'public', 'data', 'consultation_slots', slot.id), slot);
+                        }
+                    }
+
+                    // Load bookings
+                    const bookingsRef = collection(db, 'artifacts', 'sean-therapy-site', 'public', 'data', 'consultations');
+                    const bookingsSnap = await getDocs(bookingsRef);
+                    bookingsList = [];
+                    bookingsSnap.forEach(docSnap => {
+                        bookingsList.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+                }
+            } catch (e) {
+                console.log("Running in standalone mode with local state:", e);
+            }
+            renderSlots();
+            renderAdminSlots();
+            renderAdminBookings();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            emailjs.init("yAOWUhW6zZ8xiQYGv");
+            initFirebaseAndData();
+            
+            // Set default date picker value to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('new-slot-date').value = tomorrow.toISOString().split('T')[0];
+        });
+
+        // Render Available Slots for Clients
+        function renderSlots() {
+            const container = document.getElementById('available-slots-container');
+            container.innerHTML = '';
+
+            const available = activeSlots.filter(s => !s.booked);
+            if (available.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-8 text-earth-600 text-sm">All current consultation slots are booked. Please check back soon or contact Sean directly.</div>`;
+                return;
             }
 
-            function animateLeaves() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                leaves.forEach(leaf => {
-                    leaf.x += leaf.speedX;
-                    leaf.y += leaf.speedY;
-                    leaf.angle += leaf.spin;
+            available.forEach(slot => {
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-2xl border transition flex items-center justify-between cursor-pointer ${selectedSlot && selectedSlot.id === slot.id ? 'border-sage-700 bg-sage-50 shadow-sm' : 'border-sage-200 bg-white hover:border-sage-400'}`;
+                card.onclick = () => selectSlot(slot);
+                card.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-sage-100 text-sage-700 flex items-center justify-center font-bold text-sm">
+                            <i class="fa-regular fa-calendar"></i>
+                        </div>
+                        <div>
+                            <p class="font-serif font-bold text-sage-900 text-sm">${slot.date}</p>
+                            <p class="text-xs text-earth-600">${slot.time}</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-semibold px-3 py-1.5 rounded-full ${selectedSlot && selectedSlot.id === slot.id ? 'bg-sage-700 text-white' : 'bg-sage-100 text-sage-800'}">
+                        ${selectedSlot && selectedSlot.id === slot.id ? 'Selected' : 'Select'}
+                    </span>
+                `;
+                container.appendChild(card);
+            });
+        }
 
-                    if (leaf.y > canvas.height + 20) leaf.y = -20;
-                    if (leaf.x > canvas.width + 20) leaf.x = -20;
-                    if (leaf.x < -20) leaf.x = canvas.width + 20;
+        function selectSlot(slot) {
+            selectedSlot = slot;
+            renderSlots();
+            document.getElementById('selected-slot-display').innerText = `${slot.date} at ${slot.time}`;
+            document.getElementById('booking-form-card').classList.remove('hidden');
+            document.getElementById('booking-form-card').scrollIntoView({ behavior: 'smooth' });
+        }
 
-                    drawLeaf(leaf.x, leaf.y, leaf.size, leaf.angle);
-                });
-                requestAnimationFrame(animateLeaves);
+        function cancelBookingSelection() {
+            selectedSlot = null;
+            document.getElementById('booking-form-card').classList.add('hidden');
+            renderSlots();
+        }
+
+        // Handle Booking Submission & Email Dispatch
+        async function handleBookingSubmit(event) {
+            event.preventDefault();
+            if (!selectedSlot) return;
+
+            const name = document.getElementById('client-name').value;
+            const email = document.getElementById('client-email').value;
+            const phone = document.getElementById('client-phone').value;
+            const message = document.getElementById('client-message').value;
+
+            const btn = document.getElementById('submit-booking-btn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Confirming...';
+            btn.disabled = true;
+
+            const bookingData = {
+                slotId: selectedSlot.id,
+                date: selectedSlot.date,
+                time: selectedSlot.time,
+                clientName: name,
+                clientEmail: email,
+                clientPhone: phone,
+                message: message,
+                timestamp: new Date().toISOString()
+            };
+
+            // Save booking to Firestore / Local
+            try {
+                if (db) {
+                    const { collection, addDoc, doc, updateDoc } = window.firebaseAppModules;
+                    await addDoc(collection(db, 'artifacts', 'sean-therapy-site', 'public', 'data', 'consultations'), bookingData);
+                    await updateDoc(doc(db, 'artifacts', 'sean-therapy-site', 'public', 'data', 'consultation_slots', selectedSlot.id), { booked: true });
+                }
+            } catch (e) {
+                console.log("Firestore write simulation:", e);
             }
 
-            animateLeaves();
+            // Mark slot as booked locally
+            selectedSlot.booked = true;
+            bookingsList.push(bookingData);
+
+            // Send EmailJS Notification (Strictly using template variables: client_name, client_email, time, date)
+            const templateParams = {
+                client_name: name,
+                client_email: email,
+                time: selectedSlot.time,
+                date: selectedSlot.date
+            };
+
+            try {
+                // Send to primary therapist & test email
+                await emailjs.send('Quantum Studios', 'template_zl8ctdc', templateParams);
+            } catch (err) {
+                console.log("Email dispatch log:", err);
+            }
+
+            // Generate Google Calendar invite link
+            const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=15-Minute+Consultation+with+Sean+Martin&dates=${selectedSlot.date.replace(/-/g,'')}/${selectedSlot.date.replace(/-/g,'')}&details=Introductory+therapy+consultation+with+Sean+Martin.+No+paperwork+required.&location=Google+Meet`;
+            document.getElementById('gcal-invite-link').href = gcalUrl;
+            document.getElementById('success-slot-time').innerText = `${selectedSlot.date} at ${selectedSlot.time}`;
+
+            // UI transition
+            document.getElementById('booking-form-card').classList.add('hidden');
+            document.getElementById('booking-success-card').classList.remove('hidden');
+            btn.innerHTML = 'Confirm & Get Calendar Invite';
+            btn.disabled = false;
+            renderSlots();
+            renderAdminSlots();
+            renderAdminBookings();
+        }
+
+        function resetBookingFlow() {
+            selectedSlot = null;
+            document.getElementById('consultation-form').reset();
+            document.getElementById('booking-success-card').classList.add('hidden');
+            renderSlots();
+            document.getElementById('consultation').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Admin Modals & Authentication
+        function openAdminModal() {
+            document.getElementById('admin-signin-modal').classList.remove('hidden');
+            document.getElementById('admin-signin-modal').classList.add('flex');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-signin-modal').classList.add('hidden');
+            document.getElementById('admin-signin-modal').classList.remove('flex');
+        }
+
+        function handleAdminLogin(event) {
+            event.preventDefault();
+            const u = document.getElementById('admin-user').value;
+            const p = document.getElementById('admin-pass').value;
+
+            if (u === 'sean' && p === 'ABC123!@#') {
+                closeAdminModal();
+                document.getElementById('admin-user').value = '';
+                document.getElementById('admin-pass').value = '';
+                document.getElementById('login-error').classList.add('hidden');
+                openAdminDashboard();
+            } else {
+                const err = document.getElementById('login-error');
+                err.innerText = 'Incorrect username or password.';
+                err.classList.remove('hidden');
+            }
+        }
+
+        function openAdminDashboard() {
+            document.getElementById('admin-dashboard-modal').classList.remove('hidden');
+            document.getElementById('admin-dashboard-modal').classList.add('flex');
+            renderAdminSlots();
+            renderAdminBookings();
+        }
+
+        function closeAdminDashboard() {
+            document.getElementById('admin-dashboard-modal').classList.add('hidden');
+            document.getElementById('admin-dashboard-modal').classList.remove('flex');
+        }
+
+        function switchAdminTab(tab) {
+            ['availability', 'bookings', 'settings'].forEach(t => {
+                document.getElementById(`tab-content-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).className = 'px-4 py-2 rounded-xl text-xs font-semibold text-earth-700 hover:bg-sage-50 transition';
+            });
+            document.getElementById(`tab-content-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tab}`).className = 'px-4 py-2 rounded-xl text-xs font-semibold bg-sage-700 text-white transition';
+        }
+
+        function renderAdminSlots() {
+            const list = document.getElementById('admin-slots-list');
+            list.innerHTML = '';
+            if (activeSlots.length === 0) {
+                list.innerHTML = `<p class="text-xs text-earth-600">No consultation slots created yet.</p>`;
+                return;
+            }
+            activeSlots.forEach(slot => {
+                const item = document.createElement('div');
+                item.className = 'p-3 rounded-xl border border-sage-200 bg-white flex items-center justify-between text-sm';
+                item.innerHTML = `
+                    <div>
+                        <span class="font-bold text-sage-900">${slot.date}</span> at <span class="text-earth-800">${slot.time}</span>
+                        <span class="ml-2 px-2 py-0.5 rounded-full text-[10px] font-semibold ${slot.booked ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}">
+                            ${slot.booked ? 'Booked' : 'Available'}
+                        </span>
+                    </div>
+                    <button onclick="deleteSlot('${slot.id}')" class="text-xs text-red-600 hover:text-red-800 font-semibold px-3 py-1">Delete</button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        async function addNewSlot() {
+            const date = document.getElementById('new-slot-date').value;
+            const time = document.getElementById('new-slot-time').value;
+            if (!date || !time) {
+                alert('Please enter both date and time.');
+                return;
+            }
+
+            const newSlotId = 'slot-' + Date.now();
+            const newSlot = { id: newSlotId, date, time, booked: false };
+
+            activeSlots.push(newSlot);
+            try {
+                if (db) {
+                    const { doc, setDoc } = window.firebaseAppModules;
+                    await setDoc(doc(db, 'artifacts', 'sean-therapy-site', 'public', 'data', 'consultation_slots', newSlotId), newSlot);
+                }
+            } catch (e) {
+                console.log("Firestore slot add simulation:", e);
+            }
+
+            document.getElementById('new-slot-time').value = '';
+            renderAdminSlots();
+            renderSlots();
+        }
+
+        async function deleteSlot(id) {
+            activeSlots = activeSlots.filter(s => s.id !== id);
+            try {
+                if (db) {
+                    const { doc, deleteDoc } = window.firebaseAppModules;
+                    await deleteDoc(doc(db, 'artifacts', 'sean-therapy-site', 'public', 'data', 'consultation_slots', id));
+                }
+            } catch (e) {
+                console.log("Firestore slot delete simulation:", e);
+            }
+            renderAdminSlots();
+            renderSlots();
+        }
+
+        function renderAdminBookings() {
+            const list = document.getElementById('admin-bookings-list');
+            list.innerHTML = '';
+            if (bookingsList.length === 0) {
+                list.innerHTML = `<p class="text-xs text-earth-600">No client bookings received yet.</p>`;
+                return;
+            }
+            bookingsList.forEach(b => {
+                const item = document.createElement('div');
+                item.className = 'p-4 rounded-2xl border border-sage-200 bg-sage-50 space-y-2 text-sm';
+                item.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-sage-900">${b.clientName}</span>
+                        <span class="text-xs font-medium text-sage-700">${b.date} at ${b.time}</span>
+                    </div>
+                    <p class="text-xs text-earth-800">Email: <a href="mailto:${b.clientEmail}" class="underline text-sage-800">${b.clientEmail}</a> | Phone: ${b.clientPhone || 'Not provided'}</p>
+                    ${b.message ? `<p class="text-xs text-earth-600 italic">"${b.message}"</p>` : ''}
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function saveAdminSettings() {
+            siteConfig.testEmail = document.getElementById('setting-test-email').value;
+            siteConfig.therapistEmail = document.getElementById('setting-therapist-email').value;
+            alert('Settings saved successfully!');
         }
     </script>
 </body>
